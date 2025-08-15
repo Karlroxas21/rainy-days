@@ -1,0 +1,2 @@
+CREATE DATABASE rainydays;
+CREATE DATABASE rainydays_ory_kratos
