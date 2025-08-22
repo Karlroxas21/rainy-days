@@ -18,7 +18,7 @@ services:
       - ./.data/postgres:/var/lib/postgresql/data
       - ./src/main/resources/db.config/initdb.sql:/docker-entrypoint-initdb.d/init-db.sql
     networks:
-     - rainydays
+      - rainydays
 
   ory-kratos-migrate:
     image: oryd/kratos:v1.1.0
@@ -54,10 +54,42 @@ services:
     volumes:
       - ./misc/v1-ory-kratos-identity-schema.json:/data/v1-ory-kratos-identity-schema.json
     ports:
-#      public url
+      #      public url
       - 4433:4433
-#      private url
+      #      private url
       - 4434:4434
     restart: on-failure
     networks:
       - rainydays
+
+  minio:
+    image: minio/minio
+    environment:
+      MINIO_ROOT_USER: KARLADMIN
+      MINIO_ROOT_PASSWORD: KARLADMIN
+    profiles:
+      - dev
+    ports:
+      - 9000:9000
+      - 9001:9001
+    command: server /data --console-address ":9001"
+    volumes:
+      - ./.data/minio_data:/data
+    networks:
+      - rainydays
+
+  redis:
+    image: redis:7.2.5-alpine
+    container_name: rainydays-redis
+    restart: always
+    profiles:
+     - dev
+    ports:
+     - 6379:6379
+    command:
+     - redis-server
+     - --save
+     - '60'
+     - '1'
+    volumes:
+      - ./.data/redis:/data

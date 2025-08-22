@@ -4,6 +4,8 @@ PROFILE = dev
 ## Add start
 start:
 	./mvnw spring-boot:run
+# 	Install Maven 3.9.11 Locally first to run this
+# 	mvn spring-boot:run
 
 ## Start Docker
 docker-up:
@@ -13,9 +15,15 @@ docker-up:
 docker-down:
 	$(DOCKER_COMPOSE) --profile $(PROFILE) down
     # If Windows
+# 	rmdir /s /q .data
+# 	Linux/Mac
+	rm -rf .data
+
+clean:
+#   If Windows
 	rmdir /s /q .data
-	# Linux/Mac
-	## rm -rf .data
+# 	Linux/Mac
+# 	rimraf -rf .data
 
 ## Drop all db
 make drop-db:
