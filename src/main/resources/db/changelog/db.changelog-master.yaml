@@ -1,4 +1,10 @@
 databaseChangeLog:
+  - changeSet:
+      id: tag-v1.0
+      author: karl
+      changes:
+        - tagDatabase:
+            tag: v1.0
   - include:
       file: V1_create_tables.sql
       relativeToChangelogFile: true
