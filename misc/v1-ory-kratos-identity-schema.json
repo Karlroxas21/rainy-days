@@ -14,16 +14,6 @@
             "credentials": {
               "password": {
                 "identifier": true
-              },
-              "webauthn": {
-                "identifier": true
-              },
-              "totp": {
-                "account_name": true
-              },
-              "code": {
-                "identifier": true,
-                "via": "email"
               }
             },
             "recovery": {
@@ -40,16 +30,6 @@
             "credentials": {
               "password": {
                 "identifier": true
-              },
-              "webauthn": {
-                "identifier": true
-              },
-              "totp": {
-                "account_name": true
-              },
-              "code": {
-                "identifier": true,
-                "via": "email"
               }
             }
           }
@@ -71,11 +51,11 @@
             }
           }
         }
-      }
+      },
+      "required": [
+        "email"
+      ]
     }
   },
-  "required": [
-    "email"
-  ],
   "additionalProperties": true
 }

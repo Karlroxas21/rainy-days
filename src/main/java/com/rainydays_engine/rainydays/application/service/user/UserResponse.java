@@ -1,0 +1,13 @@
+package com.rainydays_engine.rainydays.application.service.user;
+
+import java.util.Optional;
+
+public record UserResponse(
+        String iamId,
+        String email,
+        String username,
+        String first_name,
+        Optional<String> middle_name,
+        String last_name
+) {
+}

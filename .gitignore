@@ -34,3 +34,7 @@ build/
 
 ### Postgres Data
 .data
+
+
+## .env
+.env
