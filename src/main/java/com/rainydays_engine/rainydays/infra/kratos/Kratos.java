@@ -1,8 +1,10 @@
 package com.rainydays_engine.rainydays.infra.kratos;
 
+import com.rainydays_engine.rainydays.application.port.auth.Session;
 import com.rainydays_engine.rainydays.application.port.user.IUserPort;
 import com.rainydays_engine.rainydays.application.service.user.UserRequestDto;
 import com.rainydays_engine.rainydays.errors.ApplicationError;
+import com.rainydays_engine.rainydays.utils.CallResult;
 import com.rainydays_engine.rainydays.utils.CallWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,5 +79,69 @@ public class Kratos implements IUserPort {
             }
         });
 
+    }
+
+    @Override
+    public Session userLogin(String identifier, String password) {
+        CallResult<LoginFlow> loginFlow = CallWrapper.syncCall(() ->
+                this.frontendApi.createNativeLoginFlow(
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null)
+        );
+
+        if (loginFlow.isFailure()) {
+            logger.error("OryKratos#userLogin(): frontendApi.createNativeLoginFlow() failed", loginFlow.getError());
+            throw ApplicationError.InternalError(loginFlow.getError());
+        }
+
+        UpdateLoginFlowWithPasswordMethod updateLoginFlowWithPasswordMethod = new UpdateLoginFlowWithPasswordMethod()
+                .method("password")
+                .password(password)
+                .identifier(identifier);
+
+        UpdateLoginFlowBody body = new UpdateLoginFlowBody(updateLoginFlowWithPasswordMethod);
+
+        CallResult<SuccessfulNativeLogin> updateLoginFlow = CallWrapper.syncCall(() ->
+                this.frontendApi.updateLoginFlow(loginFlow.getResult().getId(), body, null, null)
+        );
+
+        if(updateLoginFlow.isFailure()) {
+            logger.error("OryKratos#userLogin(): frontendApi.updateLoginFlow() failed", updateLoginFlow.getError());
+            throw ApplicationError.InternalError(updateLoginFlow.getError());
+        }
+
+        SuccessfulNativeLogin loginResult = updateLoginFlow.getResult();
+
+        // Fetch full identity traits
+        CallResult<sh.ory.kratos.model.Session> sessionResult = CallWrapper.syncCall(() ->
+                this.frontendApi.toSession(loginResult.getSessionToken(), null, null)
+        );
+
+        if(sessionResult.isFailure()) {
+            logger.error("OryKratos#userLogin(): sessionResult() failed", sessionResult.getError());
+            throw ApplicationError.InternalError(sessionResult.getError());
+        }
+
+        sh.ory.kratos.model.Session userSession = sessionResult.getResult();
+        Identity identity = userSession.getIdentity();
+
+        // Extract traits as a Map<String, Object>
+        Map<String, Object> traits = (Map<String, Object>) identity.getTraits();
+
+        Session session = new Session(
+                loginResult.getSession().getId(),
+                loginResult.getSessionToken(),
+                loginResult.getSession().getExpiresAt(),
+                loginResult.getSession().getDevices(),
+                null,
+                traits
+                );
+
+        return session;
     }
 }

@@ -2,7 +2,7 @@ package com.rainydays_engine.rainydays.application.service.user;
 
 import java.util.Optional;
 
-public record UserResponse(
+public record UserRegisterResponse(
         String iamId,
         String email,
         String username,

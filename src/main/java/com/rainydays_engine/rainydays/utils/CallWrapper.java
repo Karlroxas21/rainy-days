@@ -1,10 +1,9 @@
 package com.rainydays_engine.rainydays.utils;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Supplier;
 
 public class CallWrapper {
     // Sync Call
-    public static <T> CallResult<T> syncCall(Supplier<T> func) {
+    public static <T> CallResult<T> syncCall(ThrowingSupplier<T> func) {
         try {
             return CallResult.success(func.get());
         } catch (Throwable error) {
