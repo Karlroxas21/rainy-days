@@ -89,4 +89,26 @@ public class User implements IUserService {
 
         return userLoginResponse;
     }
+
+    @Override
+    public Session whoAmI(String token) {
+        CallResult<Session> sessionFromToken = CallWrapper.syncCall(() -> this.iUserPort.getSessionFromToken(token));
+
+        if(sessionFromToken.isFailure()){
+            logger.error("User#whoAmI(): iUserPort.getSessionFromToken() failed", sessionFromToken.getError());
+            throw ApplicationError.Unauthorized(null);
+        }
+
+        Session session = new Session(
+                sessionFromToken.getResult().id(),
+                sessionFromToken.getResult().token(),
+                sessionFromToken.getResult().expiresAt(),
+                sessionFromToken.getResult().devices(),
+                sessionFromToken.getResult().identity(),
+                sessionFromToken.getResult().traits()
+        );
+
+        return session;
+    }
+
 }

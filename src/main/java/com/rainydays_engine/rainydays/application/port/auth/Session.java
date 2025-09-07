@@ -1,5 +1,8 @@
 package com.rainydays_engine.rainydays.application.port.auth;
 
+import sh.ory.kratos.model.Identity;
+import sh.ory.kratos.model.SessionDevice;
+
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
@@ -9,8 +12,8 @@ public record Session(
         String id,
         String token,
         OffsetDateTime expiresAt,
-        List<sh.ory.kratos.model.SessionDevice> devices,
-        Optional<AuthIdentity> identity,
+        List<SessionDevice> devices,
+        Optional<Identity> identity,
         Map<String, Object> traits
-){}
+){ }
 

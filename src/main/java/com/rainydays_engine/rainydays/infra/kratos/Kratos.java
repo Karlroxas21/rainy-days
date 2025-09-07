@@ -16,6 +16,7 @@ import sh.ory.kratos.model.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @Component
@@ -143,5 +144,35 @@ public class Kratos implements IUserPort {
                 );
 
         return session;
+    }
+
+    @Override
+    public Session getSessionFromToken(String sessionToken) {
+
+        CallResult<sh.ory.kratos.model.Session> session = CallWrapper.syncCall(() ->
+                this.frontendApi.toSession(sessionToken, null, null));
+
+        if(session.isFailure()){
+            logger.error("OryKratos#getSessionFromToken(): toSession() failed", session.getError());
+            throw ApplicationError.InternalError(session.getError());
+        }
+
+        Object toTraits = session.getResult().getIdentity().getTraits();
+        logger.info("TO TRAITS: {}", toTraits);
+
+        sh.ory.kratos.model.Session userSession = session.getResult();
+        Identity identity = userSession.getIdentity();
+
+        // Extract traits as a Map<String, Object>
+        Map<String, Object> traits = (Map<String, Object>) identity.getTraits();
+
+        return new Session(
+                session.getResult().getId(),
+                sessionToken,
+                session.getResult().getExpiresAt(),
+                session.getResult().getDevices(),
+                Optional.ofNullable(session.getResult().getIdentity()),
+                traits
+        );
     }
 }
