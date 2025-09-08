@@ -3,9 +3,9 @@ PROFILE = dev
 
 ## Add start
 start:
-	./mvnw spring-boot:run
+# 	./mvnw spring-boot:run
 # 	Install Maven 3.9.11 Locally first to run this
-# 	mvn spring-boot:run
+	mvn spring-boot:run
 
 ## Start Docker
 docker-up:
@@ -17,7 +17,7 @@ docker-down:
     # If Windows
 # 	rmdir /s /q .data
 # 	Linux/Mac
-	rm -rf .data
+	#rm -rf .data
 
 clean:
 #   If Windows
@@ -39,3 +39,7 @@ migrate-history:
 	--username=dev \
 	--password=dev \
 	history
+
+## Reload Maven
+mvn-clean-resolve:
+	mvn clean dependency:resolve
