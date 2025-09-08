@@ -55,6 +55,8 @@ services:
       IDENTITY_DEFAULT_SCHEMA_ID: user
     volumes:
       - ./misc/v1-ory-kratos-identity-schema.json:/data/v1-ory-kratos-identity-schema.json
+      - ./kratos/config/kratos.yaml:/etc/config/kratos/kratos.yaml
+    command: serve --dev --config /etc/config/kratos/kratos.yaml
     ports:
       #      public url
       - 4433:4433

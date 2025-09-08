@@ -1,0 +1,10 @@
+version: v0.12.0
+
+hashers:
+  algorithm: "argon2"
+  argon2:
+    parallelism: 1
+    memory: 128MB
+    iterations: 3
+    salt_length: 16
+    key_length: 32
