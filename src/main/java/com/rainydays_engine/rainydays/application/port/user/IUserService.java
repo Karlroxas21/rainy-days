@@ -11,4 +11,5 @@ public interface IUserService {
     CompletableFuture<UserRegisterResponse> userRegister(UserRequestDto userRequestDto);
     UserLoginResponse userLogin(String identifier, String password);
     Session whoAmI(String token);
+    void resetPassword(String id, String password);
 }

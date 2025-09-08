@@ -175,4 +175,55 @@ public class Kratos implements IUserPort {
                 traits
         );
     }
+
+    @Override
+    public void resetPassword(String id, String password) {
+        CallResult<Identity> userIdentity = CallWrapper.syncCall(() ->
+                this.identityApi.getIdentity(id, null));
+
+        if(userIdentity.isFailure()) {
+            logger.error("OryKratos#resetPassword(): this.identityApi.getIdentity() failed", userIdentity.getError());
+            throw ApplicationError.InternalError(userIdentity.getError());
+        }
+
+        Identity identity = userIdentity.getResult();
+
+        // Build password credential config
+        IdentityWithCredentialsPasswordConfig identityWithCredentialsPasswordConfig = new IdentityWithCredentialsPasswordConfig()
+                .password(password);
+
+        // Wrap credentials
+        IdentityWithCredentialsPassword passwordWrapper = new IdentityWithCredentialsPassword()
+                .config(identityWithCredentialsPasswordConfig);
+
+        IdentityWithCredentials identityWithCredentials = new IdentityWithCredentials()
+                .password(passwordWrapper);
+
+        // Build update body
+        UpdateIdentityBody updateIdentityBody = new UpdateIdentityBody()
+                .schemaId(identity.getSchemaId())
+                .traits(identity.getTraits())
+                .credentials(identityWithCredentials);
+
+
+        CallResult<Identity> updateIdentity = CallWrapper.syncCall(() ->
+                this.identityApi.updateIdentity(id, updateIdentityBody));
+
+
+
+        if(updateIdentity.isFailure()){
+            logger.error("OryKratos#resetPassword(): this.identityApi.udpateIdentity() failed", updateIdentity.getError());
+            if(updateIdentity.getError() instanceof ApiException) {
+                if(updateIdentity.getError().getMessage().equals("Not Found")){
+                    logger.warn("OryKratos#resetPassword(): Not Found", updateIdentity.getError());
+                    throw ApplicationError.NotFound(id);
+                }
+                throw ApplicationError.InternalError(updateIdentity.getError());
+            }
+            throw ApplicationError.InternalError(updateIdentity.getError());
+        }
+
+        logger.info("User {} successfully reset password ", id);
+
+    }
 }

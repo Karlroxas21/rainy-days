@@ -1,6 +1,12 @@
 CREATE TABLE IF NOT EXISTS users (
 	id UUID PRIMARY KEY,
-	iam_id VARCHAR(255),
+	iam_id VARCHAR(255) NOT NULL,
+	email_address VARCHAR(255) NOT NULL,
+	username VARCHAR(255),
+	first_name VARCHAR(255) NOT NULL,
+	middle_name VARCHAR(255),
+	last_name VARCHAR(255),
+	suffix VARCHAR(10),
 	profile_url VARCHAR(255),
 	created_at TIMESTAMPTZ DEFAULT NOW(),
 	updated_at TIMESTAMPTZ,

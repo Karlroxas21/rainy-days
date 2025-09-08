@@ -31,7 +31,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserLoginResponse> login(@RequestBody UserLoginRequest loginRequest) {
+    public ResponseEntity<UserLoginResponse> login(@RequestBody @Valid UserLoginRequest loginRequest) {
         UserLoginResponse response = user.userLogin(loginRequest.getIdentifier(), loginRequest.getPassword());
 
         return ResponseEntity.ok(response);
@@ -42,6 +42,17 @@ public class UserController {
         Session session = user.whoAmI(userWhoAmIRequest.getSession_token());
 
         return ResponseEntity.ok(session);
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<Void> resetPassword(@RequestBody @Valid UserResetPasswordRequest userResetPasswordRequest) {
+
+        String email = userResetPasswordRequest.getIdentity();
+        String password = userResetPasswordRequest.getPassword();
+
+        user.resetPassword(email, password);
+
+        return ResponseEntity.noContent().build();
     }
     
 }

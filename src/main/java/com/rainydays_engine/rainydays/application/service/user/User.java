@@ -54,6 +54,13 @@ public class User implements IUserService {
                 .thenApply(iamId -> {
                     Users user = new Users();
                     user.setIamId(iamId);
+                    user.setEmailAddress(userRequestDto.getEmail());
+                    user.setUsername(userRequestDto.getUsername());
+                    user.setFirstName(userRequestDto.getFirst_name());
+                    user.setMiddleName(userRequestDto.getMiddle_name());
+                    user.setLastName(userRequestDto.getLast_name());
+                    user.setSuffix(userRequestDto.getSuffix());
+
                     return userRepository.save(user);
                 })
                 .thenAccept(savedUser -> logger.info("User#userRegister(): User saved successfully. ID: {}",
@@ -109,6 +116,24 @@ public class User implements IUserService {
         );
 
         return session;
+    }
+
+    @Override
+    public void resetPassword(String identity, String password) {
+        Optional<Users> user = userRepository.findByEmailAddress(identity);
+
+        if(!user.isPresent()) {
+            logger.info("User#resetPassword(): userRepository.findByEmail() no user found", identity);
+        }
+
+        String iamId;
+
+        if(user.isPresent()){
+            iamId = user.get().getIamId();
+
+            this.iUserPort.resetPassword(iamId, password);
+            logger.info("User#resetPassword(): iUserPort.resetPassword() Reset password Success", iamId);
+        }
     }
 
 }

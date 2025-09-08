@@ -11,5 +11,6 @@ public interface IUserPort {
     CompletableFuture<String> userRegister(UserRequestDto userRecord);
     Session userLogin(String identifier, String password);
     Session getSessionFromToken(String sessionToken);
+    void resetPassword(String identity, String password);
 }
 
