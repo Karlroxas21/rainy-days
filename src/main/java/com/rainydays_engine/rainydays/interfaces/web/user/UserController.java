@@ -1,8 +1,8 @@
 package com.rainydays_engine.rainydays.interfaces.web.user;
 
-import com.rainydays_engine.rainydays.application.port.auth.Session;
-import com.rainydays_engine.rainydays.application.service.user.*;
+import com.rainydays_engine.rainydays.domain.port.auth.Session;
 
+import com.rainydays_engine.rainydays.domain.service.user.*;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

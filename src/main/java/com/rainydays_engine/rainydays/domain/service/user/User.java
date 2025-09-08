@@ -1,14 +1,14 @@
-package com.rainydays_engine.rainydays.application.service.user;
+package com.rainydays_engine.rainydays.domain.service.user;
 
-import com.rainydays_engine.rainydays.application.port.user.IUserPort;
-import com.rainydays_engine.rainydays.application.port.user.IUserService;
-import com.rainydays_engine.rainydays.domain.repository.UserRepository;
+import com.rainydays_engine.rainydays.domain.port.user.IUserPort;
+import com.rainydays_engine.rainydays.domain.port.user.IUserService;
+import com.rainydays_engine.rainydays.infra.postgres.repository.UserRepository;
 import com.rainydays_engine.rainydays.errors.ApplicationError;
 import com.rainydays_engine.rainydays.infra.kratos.Kratos;
 import com.rainydays_engine.rainydays.infra.postgres.entity.Users;
 import com.rainydays_engine.rainydays.utils.CallResult;
 import com.rainydays_engine.rainydays.utils.CallWrapper;
-import com.rainydays_engine.rainydays.application.port.auth.Session;
+import com.rainydays_engine.rainydays.domain.port.auth.Session;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;

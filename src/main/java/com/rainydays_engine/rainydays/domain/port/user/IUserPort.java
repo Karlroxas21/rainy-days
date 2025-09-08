@@ -1,7 +1,7 @@
-package com.rainydays_engine.rainydays.application.port.user;
+package com.rainydays_engine.rainydays.domain.port.user;
 
-import com.rainydays_engine.rainydays.application.port.auth.Session;
-import com.rainydays_engine.rainydays.application.service.user.UserRequestDto;
+import com.rainydays_engine.rainydays.domain.port.auth.Session;
+import com.rainydays_engine.rainydays.domain.service.user.UserRequestDto;
 
 import java.util.concurrent.CompletableFuture;
 

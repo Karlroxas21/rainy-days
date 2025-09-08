@@ -1,4 +1,4 @@
-package com.rainydays_engine.rainydays.domain.repository;
+package com.rainydays_engine.rainydays.infra.postgres.repository;
 
 import com.rainydays_engine.rainydays.infra.postgres.entity.Users;
 import org.springframework.data.jpa.repository.JpaRepository;

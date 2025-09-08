@@ -1,4 +1,4 @@
-package com.rainydays_engine.rainydays.application.port.auth;
+package com.rainydays_engine.rainydays.domain.port.auth;
 
 import sh.ory.kratos.model.Identity;
 import sh.ory.kratos.model.SessionDevice;

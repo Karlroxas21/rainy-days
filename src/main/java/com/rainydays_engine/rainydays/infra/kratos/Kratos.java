@@ -1,8 +1,8 @@
 package com.rainydays_engine.rainydays.infra.kratos;
 
-import com.rainydays_engine.rainydays.application.port.auth.Session;
-import com.rainydays_engine.rainydays.application.port.user.IUserPort;
-import com.rainydays_engine.rainydays.application.service.user.UserRequestDto;
+import com.rainydays_engine.rainydays.domain.port.auth.Session;
+import com.rainydays_engine.rainydays.domain.port.user.IUserPort;
+import com.rainydays_engine.rainydays.domain.service.user.UserRequestDto;
 import com.rainydays_engine.rainydays.errors.ApplicationError;
 import com.rainydays_engine.rainydays.utils.CallResult;
 import com.rainydays_engine.rainydays.utils.CallWrapper;

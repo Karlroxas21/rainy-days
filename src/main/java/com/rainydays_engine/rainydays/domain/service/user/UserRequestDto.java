@@ -1,4 +1,4 @@
-package com.rainydays_engine.rainydays.application.service.user;
+package com.rainydays_engine.rainydays.domain.service.user;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
