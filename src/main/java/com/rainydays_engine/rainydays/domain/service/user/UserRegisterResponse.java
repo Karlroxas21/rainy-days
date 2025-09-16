@@ -1,7 +1,10 @@
 package com.rainydays_engine.rainydays.domain.service.user;
 
+import lombok.Builder;
+
 import java.util.Optional;
 
+@Builder
 public record UserRegisterResponse(
         String iamId,
         String email,
