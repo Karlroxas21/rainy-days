@@ -120,7 +120,7 @@ public class User implements IUserService {
 
     @Override
     public void resetPassword(String identity, String password) {
-        Optional<Users> user = userRepository.findByEmailAddress(identity);
+        Optional<String> user = userRepository.findByEmailAddress(identity);
 
         if(!user.isPresent()) {
             logger.info("User#resetPassword(): userRepository.findByEmail() no user found", identity);
@@ -129,7 +129,7 @@ public class User implements IUserService {
         String iamId;
 
         if(user.isPresent()){
-            iamId = user.get().getIamId();
+            iamId = user.get();
 
             this.iUserPort.resetPassword(iamId, password);
             logger.info("User#resetPassword(): iUserPort.resetPassword() Reset password Success", iamId);

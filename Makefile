@@ -7,6 +7,9 @@ start:
 # 	Install Maven 3.9.11 Locally first to run this
 	mvn spring-boot:run
 
+test:
+	mvn clean test
+
 ## Start Docker
 docker-up:
 	$(DOCKER_COMPOSE) --profile $(PROFILE) up -d

@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: tag-v1.0
+      author: karl
+      changes:
+        - tagDatabase:
+            tag: v1.0-test
+  - include:
+      file: V1_create_tables_FOR_TEST.sql
+      relativeToChangelogFile: true

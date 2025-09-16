@@ -26,7 +26,7 @@ public class UserController {
             @Valid @RequestBody UserRequestDto requestDto) {
 
         return user.userRegister(requestDto)
-                    .thenApply(userRegisterResponse -> ResponseEntity.ok(userRegisterResponse));
+                    .thenApply(userRegisterResponse -> ResponseEntity.status(201).body(userRegisterResponse));
 
     }
 
@@ -37,7 +37,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/whoami")
+    @PostMapping("/whoami")
     public ResponseEntity<?> whoAmI(@RequestBody UserWhoAmIRequest userWhoAmIRequest) {
         Session session = user.whoAmI(userWhoAmIRequest.getSession_token());
 
