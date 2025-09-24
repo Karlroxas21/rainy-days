@@ -5,8 +5,6 @@ import com.rainydaysengine.rainydays.domain.port.auth.Session;
 import com.rainydaysengine.rainydays.domain.service.entry.DepositEntryDto;
 import com.rainydaysengine.rainydays.domain.service.entry.Entry;
 import com.rainydaysengine.rainydays.domain.service.user.*;
-import com.rainydaysengine.rainydays.utils.CallResult;
-import com.rainydaysengine.rainydays.utils.CallWrapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;

@@ -13,6 +13,7 @@ import com.rainydaysengine.rainydays.domain.port.auth.Session;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
+@RequiredArgsConstructor
 @Service
 public class User implements IUserService {
     private static final Logger logger = LoggerFactory.getLogger(Kratos.class);
@@ -30,12 +32,6 @@ public class User implements IUserService {
     private final IUserPort iUserPort;
     private final Validator validator;
     private final UserRepository userRepository;
-
-    public User(IUserPort iUserPort, Validator validator, UserRepository userRepository) {
-        this.iUserPort = iUserPort;
-        this.validator = validator;
-        this.userRepository = userRepository;
-    }
 
     @Override
     public CompletableFuture<UserRegisterResponse> userRegister(UserRequestDto userRequestDto) {

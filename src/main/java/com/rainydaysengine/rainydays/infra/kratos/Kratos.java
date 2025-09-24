@@ -6,6 +6,7 @@ import com.rainydaysengine.rainydays.domain.service.user.UserRequestDto;
 import com.rainydaysengine.rainydays.errors.ApplicationError;
 import com.rainydaysengine.rainydays.utils.CallResult;
 import com.rainydaysengine.rainydays.utils.CallWrapper;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -19,6 +20,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+@RequiredArgsConstructor
 @Component
 public class Kratos implements IUserPort {
     private static final Logger logger = LoggerFactory.getLogger(Kratos.class);
@@ -27,11 +29,6 @@ public class Kratos implements IUserPort {
     private final IdentityApi identityApi;
     private final FrontendApi frontendApi;
     int numbs = 23;
-
-    public Kratos(IdentityApi identityApi, FrontendApi frontendApi) {
-        this.identityApi = identityApi;
-        this.frontendApi = frontendApi;
-    }
 
     @Override
     public CompletableFuture<String> userRegister(UserRequestDto userRequestDto) {

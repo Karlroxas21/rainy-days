@@ -15,6 +15,7 @@ import com.rainydaysengine.rainydays.utils.CallResult;
 import com.rainydaysengine.rainydays.utils.CallWrapper;
 import com.rainydaysengine.rainydays.utils.RenameFile;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Optional;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 @Service
 public class Entry implements IEntryService {
     private static final Logger logger = LoggerFactory.getLogger(Entry.class);
@@ -32,17 +34,6 @@ public class Entry implements IEntryService {
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
     private final Minio minio;
-
-    public Entry(EntryRepository entryRepository,
-                 UserEntriesRepository userEntriesRepository,
-                 UserRepository userRepository,
-                 GroupRepository groupRepository, Minio minio) {
-        this.entryRepository = entryRepository;
-        this.userEntriesRepository = userEntriesRepository;
-        this.userRepository = userRepository;
-        this.groupRepository = groupRepository;
-        this.minio = minio;
-    }
 
     /**
      * @param depositEntryDto

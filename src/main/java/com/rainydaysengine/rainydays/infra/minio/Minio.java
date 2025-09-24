@@ -2,10 +2,10 @@ package com.rainydaysengine.rainydays.infra.minio;
 
 import com.rainydaysengine.rainydays.domain.port.entry.IEntryPort;
 import com.rainydaysengine.rainydays.errors.ApplicationError;
-import com.rainydaysengine.rainydays.infra.kratos.Kratos;
 import com.rainydaysengine.rainydays.utils.CallResult;
 import com.rainydaysengine.rainydays.utils.CallWrapper;
 import io.minio.*;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
 
+@RequiredArgsConstructor
 @Component
 public class Minio  implements IEntryPort {
     private static final Logger logger = LoggerFactory.getLogger(Minio.class);
@@ -22,10 +23,6 @@ public class Minio  implements IEntryPort {
 
     @Value("${minio.bucket}")
     private String bucket;
-
-    public Minio(MinioClient minioClient) {
-        this.minioClient = minioClient;
-    }
 
     /**
      * @param objectName

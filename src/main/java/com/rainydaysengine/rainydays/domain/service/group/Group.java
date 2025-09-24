@@ -6,6 +6,7 @@ import com.rainydaysengine.rainydays.infra.postgres.entity.GroupEntity;
 import com.rainydaysengine.rainydays.infra.postgres.repository.GroupRepository;
 import com.rainydaysengine.rainydays.utils.CallResult;
 import com.rainydaysengine.rainydays.utils.CallWrapper;
+import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,15 +14,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@RequiredArgsConstructor
 @Service
 public class Group implements IGroupService {
     private static final Logger logger = LoggerFactory.getLogger(Group.class);
 
     private final GroupRepository groupRepository;
-
-    public Group(GroupRepository groupRepository) {
-        this.groupRepository = groupRepository;
-    }
 
     /**
      * @param groupDto
