@@ -1,10 +1,10 @@
 package com.rainydaysengine.rainydays.interfaces.web.user;
 
-import com.rainydaysengine.rainydays.domain.port.auth.Session;
+import com.rainydaysengine.rainydays.application.port.auth.Session;
 
-import com.rainydaysengine.rainydays.domain.service.entry.DepositEntryDto;
-import com.rainydaysengine.rainydays.domain.service.entry.Entry;
-import com.rainydaysengine.rainydays.domain.service.user.*;
+import com.rainydaysengine.rainydays.application.service.entry.DepositEntryDto;
+import com.rainydaysengine.rainydays.application.service.entry.Entry;
+import com.rainydaysengine.rainydays.application.service.user.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
