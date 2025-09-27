@@ -1,6 +1,6 @@
 package com.rainydaysengine.rainydays.infra.minio;
 
-import com.rainydaysengine.rainydays.domain.port.entry.IEntryPort;
+import com.rainydaysengine.rainydays.application.port.entry.IEntryPort;
 import com.rainydaysengine.rainydays.errors.ApplicationError;
 import com.rainydaysengine.rainydays.utils.CallResult;
 import com.rainydaysengine.rainydays.utils.CallWrapper;

@@ -1,9 +1,10 @@
 package com.rainydaysengine.rainydays.interfaces.web.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rainydaysengine.rainydays.domain.port.auth.Session;
-import com.rainydaysengine.rainydays.domain.port.user.IUserPort;
-import com.rainydaysengine.rainydays.domain.service.user.*;
+import com.rainydaysengine.rainydays.application.port.auth.Session;
+import com.rainydaysengine.rainydays.application.port.user.IUserPort;
+import com.rainydaysengine.rainydays.application.service.entry.Entry;
+import com.rainydaysengine.rainydays.application.service.user.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,7 +14,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -38,8 +40,11 @@ public class UserControllerTests {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @Autowired
     private User userService;
+
+    @Autowired
+    private Entry entry;
 
     @Mock
     private IUserPort iUserPort;
@@ -197,5 +202,18 @@ public class UserControllerTests {
                 .content(objectMapper.writeValueAsString(userResetPasswordRequest)))
                 .andExpect(status().isNoContent());
 
+    }
+
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        User userService() {
+            return Mockito.mock(User.class);
+        }
+
+        @Bean
+        Entry entryService() {
+            return Mockito.mock(Entry.class);
+        }
     }
 }
