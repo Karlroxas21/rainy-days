@@ -3,6 +3,7 @@ package com.rainydaysengine.rainydays.interfaces.web.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rainydaysengine.rainydays.application.port.auth.Session;
 import com.rainydaysengine.rainydays.application.port.user.IUserPort;
+import com.rainydaysengine.rainydays.application.service.entry.DepositEntryDto;
 import com.rainydaysengine.rainydays.application.service.entry.Entry;
 import com.rainydaysengine.rainydays.application.service.user.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,6 +18,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
@@ -27,9 +29,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import static org.hamcrest.Matchers.isA;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = UserController.class)
@@ -63,6 +65,10 @@ public class UserControllerTests {
     private UserWhoAmIRequest userWhoAmIRequest;
 
     private UserResetPasswordRequest userResetPasswordRequest;
+
+    private DepositEntryDto depositEntryDto;
+
+    private MockMultipartFile mockMultipartFile;
 
     private Session session;
 
@@ -120,6 +126,21 @@ public class UserControllerTests {
                 .builder()
                 .identity("email@email.com")
                 .password("Password@2")
+                .build();
+
+        mockMultipartFile = new MockMultipartFile(
+                "photo",
+                "test-image.jpg",
+                "image/jpeg",
+                "dummy-image-content".getBytes()
+        );
+        depositEntryDto = DepositEntryDto
+                .builder()
+                .userId(UUID.randomUUID())
+                .amount(10000)
+                .note("Test")
+                .photo(mockMultipartFile)
+                .groupId(UUID.randomUUID())
                 .build();
     }
 
@@ -193,7 +214,7 @@ public class UserControllerTests {
     }
 
     @Test
-    public void UserController_ResetPassword_ReturnsVoid() throws Exception{
+    public void UserController_ResetPassword_ReturnsVoid() throws Exception {
         Mockito.doNothing().when(userService).resetPassword(
                 "email@email.com",
                 "Password@1");
@@ -202,6 +223,23 @@ public class UserControllerTests {
                 .content(objectMapper.writeValueAsString(userResetPasswordRequest)))
                 .andExpect(status().isNoContent());
 
+    }
+
+    @Test
+    public void UserController_AddEntry_ReturnsString() throws Exception {
+        when(this.entry.addEntry(Mockito.any(DepositEntryDto.class)))
+                .thenReturn(String.valueOf(UUID.randomUUID()));
+
+        ResultActions response = mockMvc.perform(multipart("/v1/user/add-entry")
+                .file(this.mockMultipartFile) // photo
+                // Use .param() for simple string/primitive fields
+                .param("userId", depositEntryDto.getUserId().toString())
+                .param("amount", String.valueOf(depositEntryDto.getAmount()))
+                .param("groupId", String.valueOf(depositEntryDto.getGroupId()))
+                .param("note", depositEntryDto.getNote())
+               );
+
+        response.andExpect(status().isOk());
     }
 
     @TestConfiguration
