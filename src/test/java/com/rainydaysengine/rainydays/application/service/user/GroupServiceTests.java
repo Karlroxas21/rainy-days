@@ -37,8 +37,9 @@ public class GroupServiceTests {
                 .combinedGoal(10000)
                 .build();
     }
+
     @Test
-    public void GroupService_CreateNewGroup_ReturnUUID(){
+    public void GroupService_CreateNewGroup_ReturnUUID() {
 
         when(this.groupRepository.findByGroupName(this.groupDto.getGroupName()))
                 .thenReturn(Optional.empty());

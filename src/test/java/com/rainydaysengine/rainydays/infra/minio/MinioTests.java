@@ -30,7 +30,7 @@ public class MinioTests {
     }
 
     @Test
-    public void EntryService_AddEntry_ReturnsString(){
+    public void EntryService_AddEntry_ReturnsString() {
         String renamedFile = RenameFile.rename(this.mockFile, "karl");
         String objectName = "app/entries/" + renamedFile;
         String contentType = this.mockFile.getContentType();

@@ -83,13 +83,13 @@ public class Kratos implements IUserPort {
     public Session userLogin(String identifier, String password) {
         CallResult<LoginFlow> loginFlow = CallWrapper.syncCall(() ->
                 this.frontendApi.createNativeLoginFlow(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null)
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null)
         );
 
         if (loginFlow.isFailure()) {
@@ -108,7 +108,7 @@ public class Kratos implements IUserPort {
                 this.frontendApi.updateLoginFlow(loginFlow.getResult().getId(), body, null, null)
         );
 
-        if(updateLoginFlow.isFailure()) {
+        if (updateLoginFlow.isFailure()) {
             logger.error("OryKratos#userLogin(): frontendApi.updateLoginFlow() failed", updateLoginFlow.getError());
             throw ApplicationError.InternalError(updateLoginFlow.getError());
         }
@@ -120,7 +120,7 @@ public class Kratos implements IUserPort {
                 this.frontendApi.toSession(loginResult.getSessionToken(), null, null)
         );
 
-        if(sessionResult.isFailure()) {
+        if (sessionResult.isFailure()) {
             logger.error("OryKratos#userLogin(): sessionResult() failed", sessionResult.getError());
             throw ApplicationError.InternalError(sessionResult.getError());
         }
@@ -138,7 +138,7 @@ public class Kratos implements IUserPort {
                 loginResult.getSession().getDevices(),
                 null,
                 traits
-                );
+        );
 
         return session;
     }
@@ -149,7 +149,7 @@ public class Kratos implements IUserPort {
         CallResult<sh.ory.kratos.model.Session> session = CallWrapper.syncCall(() ->
                 this.frontendApi.toSession(sessionToken, null, null));
 
-        if(session.isFailure()){
+        if (session.isFailure()) {
             logger.error("OryKratos#getSessionFromToken(): toSession() failed", session.getError());
             throw ApplicationError.InternalError(session.getError());
         }
@@ -178,7 +178,7 @@ public class Kratos implements IUserPort {
         CallResult<Identity> userIdentity = CallWrapper.syncCall(() ->
                 this.identityApi.getIdentity(id, null));
 
-        if(userIdentity.isFailure()) {
+        if (userIdentity.isFailure()) {
             logger.error("OryKratos#resetPassword(): this.identityApi.getIdentity() failed", userIdentity.getError());
             throw ApplicationError.InternalError(userIdentity.getError());
         }
@@ -207,11 +207,10 @@ public class Kratos implements IUserPort {
                 this.identityApi.updateIdentity(id, updateIdentityBody));
 
 
-
-        if(updateIdentity.isFailure()){
+        if (updateIdentity.isFailure()) {
             logger.error("OryKratos#resetPassword(): this.identityApi.udpateIdentity() failed", updateIdentity.getError());
-            if(updateIdentity.getError() instanceof ApiException) {
-                if(updateIdentity.getError().getMessage().equals("Not Found")){
+            if (updateIdentity.getError() instanceof ApiException) {
+                if (updateIdentity.getError().getMessage().equals("Not Found")) {
                     logger.warn("OryKratos#resetPassword(): Not Found", updateIdentity.getError());
                     throw ApplicationError.NotFound(id);
                 }

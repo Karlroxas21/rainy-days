@@ -45,7 +45,7 @@ public class UserRepositoryTests {
     }
 
     @Test
-    public void PokemonRepository_GetAll_ReturnMoreThanOneUser(){
+    public void PokemonRepository_GetAll_ReturnMoreThanOneUser() {
         // Arrange
         UsersEntity user = UsersEntity.builder()
                 .iamId(UUID.randomUUID().toString())
@@ -57,7 +57,7 @@ public class UserRepositoryTests {
                 .build();
 
         UsersEntity user2 = UsersEntity.builder()
-                .iamId( UUID.randomUUID().toString())
+                .iamId(UUID.randomUUID().toString())
                 .emailAddress("yen@yen.com")
                 .username("yen-cath")
                 .firstName("nrtn")
@@ -76,7 +76,7 @@ public class UserRepositoryTests {
     }
 
     @Test
-    public void PokemonRepository_FindById_ReturnsUser(){
+    public void PokemonRepository_FindById_ReturnsUser() {
         // Arrange
         UsersEntity user = UsersEntity.builder()
                 .iamId(UUID.randomUUID().toString())
@@ -138,7 +138,7 @@ public class UserRepositoryTests {
     }
 
     @Test
-    public void PokemonRepository_DeleteById_ReturnsUserIsEmpty(){
+    public void PokemonRepository_DeleteById_ReturnsUserIsEmpty() {
         // Arrange
         UsersEntity user = UsersEntity.builder()
                 .iamId(UUID.randomUUID().toString())

@@ -2,6 +2,7 @@ package com.rainydaysengine.rainydays.errors;
 
 import org.springframework.http.HttpStatus;
 
+
 public class ApplicationError extends RuntimeException {
 
     private final ErrorDetails errorDetails;
@@ -12,10 +13,6 @@ public class ApplicationError extends RuntimeException {
         this.errorDetails = errorDetails;
     }
 
-    public ErrorDetails getErrorDetails() {
-        return errorDetails;
-    }
-
     public static ApplicationError InternalError(Object details) {
         return new ApplicationError(new ErrorDetails(
                 "INTERNAL_ERROR",
@@ -23,7 +20,7 @@ public class ApplicationError extends RuntimeException {
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 details,
                 null
-                )
+        )
         );
     }
 
@@ -84,5 +81,9 @@ public class ApplicationError extends RuntimeException {
                 null
         )
         );
+    }
+
+    public ErrorDetails getErrorDetails() {
+        return errorDetails;
     }
 }

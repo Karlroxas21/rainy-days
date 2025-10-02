@@ -10,5 +10,5 @@ public record UserLoginResponse(
         Map<String, Object> traits,
         String token,
         OffsetDateTime expiry
-        ){
+) {
 }

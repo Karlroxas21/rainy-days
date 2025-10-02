@@ -1,4 +1,5 @@
 package com.rainydaysengine.rainydays.utils;
+
 import java.util.concurrent.CompletableFuture;
 
 public class CallWrapper {
@@ -10,18 +11,19 @@ public class CallWrapper {
             return CallResult.failure(error);
         }
     }
+
     /**
      * Usage:
-     *
+     * <p>
      * CallResult<String> result = CallWrapper.syncCall(() -> {
-     *     // some risky operation
-     *     return "Hello, World!";
+     * // some risky operation
+     * return "Hello, World!";
      * });
-     *
+     * <p>
      * if (result.isSuccess()) {
-     *     System.out.println("Result: " + result.getResult());
+     * System.out.println("Result: " + result.getResult());
      * } else {
-     *     System.err.println("Error: " + result.getError().getMessage());
+     * System.err.println("Error: " + result.getError().getMessage());
      * }
      */
 

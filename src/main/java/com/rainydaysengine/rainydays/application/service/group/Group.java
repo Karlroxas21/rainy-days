@@ -32,18 +32,18 @@ public class Group implements IGroupService {
         groupEntity.setCombinedGoal(groupDto.getCombinedGoal());
 
         CallResult<Optional<String>> existingGroupName = CallWrapper.syncCall(() -> this.groupRepository.findByGroupName(groupDto.getGroupName()));
-        if(existingGroupName.isFailure()) {
+        if (existingGroupName.isFailure()) {
             logger.error("Group#createNewGroup(): this.groupRepository.findByGroupName() failed", existingGroupName.getError());
             throw ApplicationError.InternalError(existingGroupName.getError());
         }
 
-        if(existingGroupName.getResult().isPresent()) {
+        if (existingGroupName.getResult().isPresent()) {
             logger.info("Group#createNewGroup(): this.groupRepository.findByGroupName() groupName already exists", groupDto.getGroupName());
             throw ApplicationError.Conflict(groupDto.getGroupName() + " already exists");
         }
 
         CallResult<GroupEntity> savedGroupEntity = CallWrapper.syncCall(() -> this.groupRepository.save(groupEntity));
-        if(savedGroupEntity.isFailure()) {
+        if (savedGroupEntity.isFailure()) {
             logger.error("Group#createNewGroup(): this.groupRepository.save() failed", savedGroupEntity.getError());
             throw ApplicationError.InternalError(savedGroupEntity.getError());
         }
