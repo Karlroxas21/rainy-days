@@ -13,7 +13,7 @@ public class RenameFile {
         String originalFileName = file.getOriginalFilename();
         String extension = "";
 
-        if(originalFileName != null && originalFileName.contains(".")) {
+        if (originalFileName != null && originalFileName.contains(".")) {
             extension = originalFileName.substring(originalFileName.lastIndexOf("."));
         }
 

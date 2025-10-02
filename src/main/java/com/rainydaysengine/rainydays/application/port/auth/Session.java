@@ -15,5 +15,6 @@ public record Session(
         List<SessionDevice> devices,
         Optional<Identity> identity,
         Map<String, Object> traits
-){ }
+) {
+}
 

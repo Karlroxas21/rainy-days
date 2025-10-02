@@ -137,7 +137,7 @@ public class UserServiceTests {
         when(userRepository.findByEmailAddress(identifier))
                 .thenReturn(Optional.ofNullable(mockIamId));
 
-        assertAll(() -> userService.resetPassword(identifier,newPassword));
+        assertAll(() -> userService.resetPassword(identifier, newPassword));
     }
 }
 

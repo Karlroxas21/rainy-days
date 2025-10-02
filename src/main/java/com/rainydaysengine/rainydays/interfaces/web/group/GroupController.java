@@ -21,7 +21,7 @@ public class GroupController {
 
     private final Group group;
 
-    public GroupController(Group group){
+    public GroupController(Group group) {
         this.group = group;
     }
 

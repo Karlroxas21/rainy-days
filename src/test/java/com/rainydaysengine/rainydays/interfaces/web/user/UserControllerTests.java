@@ -145,7 +145,7 @@ public class UserControllerTests {
     }
 
     @Test
-    public void UserController_Register_ReturnsCreated() throws Exception{
+    public void UserController_Register_ReturnsCreated() throws Exception {
 
         String mockUuid = UUID.randomUUID().toString();
 
@@ -163,7 +163,7 @@ public class UserControllerTests {
     }
 
     @Test
-    public void UserController_Login_ReturnsOk() throws Exception{
+    public void UserController_Login_ReturnsOk() throws Exception {
         String mockEmail = "email@email.com";
         String mockPassword = "Pssword@1";
         when(userService.userLogin(
@@ -172,14 +172,14 @@ public class UserControllerTests {
                 .thenReturn(userLoginResponse);
 
         ResultActions response = mockMvc.perform(post("/v1/user/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userLoginRequest)));
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userLoginRequest)));
 
         response.andExpect(status().isOk());
     }
 
     @Test
-    public void UserController_WhoAmI_ReturnsOk() throws Exception{
+    public void UserController_WhoAmI_ReturnsOk() throws Exception {
         String sampleToken = "ory_st_VhQBZogVRiaVG0SAO4bjnt4WQi4CL0p7";
         OffsetDateTime sampleExpiry = OffsetDateTime.parse("2025-09-13T10:32:48.935724071Z");
 
@@ -219,8 +219,8 @@ public class UserControllerTests {
                 "email@email.com",
                 "Password@1");
         mockMvc.perform(post("/v1/user/reset-password")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(userResetPasswordRequest)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userResetPasswordRequest)))
                 .andExpect(status().isNoContent());
 
     }
@@ -237,7 +237,7 @@ public class UserControllerTests {
                 .param("amount", String.valueOf(depositEntryDto.getAmount()))
                 .param("groupId", String.valueOf(depositEntryDto.getGroupId()))
                 .param("note", depositEntryDto.getNote())
-               );
+        );
 
         response.andExpect(status().isOk());
     }

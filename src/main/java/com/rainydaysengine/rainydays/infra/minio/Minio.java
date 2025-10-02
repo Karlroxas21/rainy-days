@@ -16,7 +16,7 @@ import java.io.InputStream;
 
 @RequiredArgsConstructor
 @Component
-public class Minio  implements IEntryPort {
+public class Minio implements IEntryPort {
     private static final Logger logger = LoggerFactory.getLogger(Minio.class);
 
     private final MinioClient minioClient;
@@ -41,16 +41,16 @@ public class Minio  implements IEntryPort {
         InputStream inputStream = file.getInputStream();
 
         CallResult<ObjectWriteResponse> upload = CallWrapper.syncCall(
-                () ->  minioClient.putObject(
-                PutObjectArgs.builder()
-                        .bucket(bucket)
-                        .object(objectName)
-                        .stream(inputStream, file.getSize(), -1)
-                        .contentType(contentType)
-                        .build()
-            )
+                () -> minioClient.putObject(
+                        PutObjectArgs.builder()
+                                .bucket(bucket)
+                                .object(objectName)
+                                .stream(inputStream, file.getSize(), -1)
+                                .contentType(contentType)
+                                .build()
+                )
         );
-        if(upload.isFailure()){
+        if (upload.isFailure()) {
             logger.error("Minio#uploadFile(): minioClient.uploadObject() failed", upload.getError());
             throw ApplicationError.InternalError(upload.getError());
         }

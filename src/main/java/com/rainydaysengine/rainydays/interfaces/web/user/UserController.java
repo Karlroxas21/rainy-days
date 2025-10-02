@@ -30,7 +30,7 @@ public class UserController {
             @Valid @RequestBody UserRequestDto requestDto) {
 
         return user.userRegister(requestDto)
-                    .thenApply(userRegisterResponse -> ResponseEntity.status(201).body(userRegisterResponse));
+                .thenApply(userRegisterResponse -> ResponseEntity.status(201).body(userRegisterResponse));
 
     }
 
@@ -59,7 +59,7 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping(value="/add-entry", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/add-entry", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> addEntry(@ModelAttribute @Valid DepositEntryDto depositEntryDto) {
 
         String newEntry = entry.addEntry(depositEntryDto);
@@ -67,10 +67,10 @@ public class UserController {
         return ResponseEntity.ok(newEntry);
     }
 
-    @PostMapping(value="/add-photo", consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> addPhoto(@RequestParam("file")MultipartFile file) throws Exception{
+    @PostMapping(value = "/add-photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> addPhoto(@RequestParam("file") MultipartFile file) throws Exception {
 
         return ResponseEntity.ok("File uploaded successfully: " + file.getOriginalFilename());
     }
-    
+
 }

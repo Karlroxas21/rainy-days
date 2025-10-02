@@ -75,12 +75,12 @@ public class User implements IUserService {
     public UserLoginResponse userLogin(String identifier, String password) {
         CallResult<Session> session = CallWrapper.syncCall(() -> this.iUserPort.userLogin(identifier, password));
 
-        if(session.isFailure()) {
+        if (session.isFailure()) {
             logger.error("User#userLogin(): frontendApi.createNativeLoginFlow() failed", session.getError());
             throw ApplicationError.Unauthorized(null);
         }
-        
-        Map<String, Object> traits =  session.getResult().traits();
+
+        Map<String, Object> traits = session.getResult().traits();
         String token = session.getResult().token();
         OffsetDateTime expiry = session.getResult().expiresAt();
 
@@ -97,7 +97,7 @@ public class User implements IUserService {
     public Session whoAmI(String token) {
         CallResult<Session> sessionFromToken = CallWrapper.syncCall(() -> this.iUserPort.getSessionFromToken(token));
 
-        if(sessionFromToken.isFailure()){
+        if (sessionFromToken.isFailure()) {
             logger.error("User#whoAmI(): iUserPort.getSessionFromToken() failed", sessionFromToken.getError());
             throw ApplicationError.Unauthorized(null);
         }
@@ -118,13 +118,13 @@ public class User implements IUserService {
     public void resetPassword(String identity, String password) {
         Optional<String> user = userRepository.findByEmailAddress(identity);
 
-        if(!user.isPresent()) {
+        if (!user.isPresent()) {
             logger.info("User#resetPassword(): userRepository.findByEmail() no user found", identity);
         }
 
         String iamId;
 
-        if(user.isPresent()){
+        if (user.isPresent()) {
             iamId = user.get();
 
             this.iUserPort.resetPassword(iamId, password);

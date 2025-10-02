@@ -46,11 +46,11 @@ public class Entry implements IEntryService {
 
         // Verify if UserId Exists
         CallResult<Optional<UsersEntity>> user = CallWrapper.syncCall(() -> this.userRepository.findById(depositEntryDto.getUserId()));
-        if(user.isFailure()) {
+        if (user.isFailure()) {
             logger.error("Entry#addEntry(): this.userRepository.findById() failed", user.getError());
             throw ApplicationError.InternalError(user.getError());
         }
-        if(user.getResult().isEmpty()) {
+        if (user.getResult().isEmpty()) {
             logger.error("Entry#addEntry(): this.userRepository.findById() no user found: {}", depositEntryDto.getUserId());
             throw ApplicationError.NotFound(depositEntryDto.getUserId());
         }
@@ -59,12 +59,12 @@ public class Entry implements IEntryService {
 
         // Verify if Group Exists
         CallResult<Optional<GroupEntity>> existingGroup = CallWrapper.syncCall(() -> this.groupRepository.findById(depositEntryDto.getGroupId()));
-        if(existingGroup.isFailure()) {
+        if (existingGroup.isFailure()) {
             logger.error("Entry#addEntry(): this.groupRepository.findById() failed", existingGroup.getError());
             throw ApplicationError.InternalError(existingGroup.getError());
         }
 
-        if(existingGroup.getResult().isEmpty()) {
+        if (existingGroup.getResult().isEmpty()) {
             logger.info("Entry#addEntry(): this.groupRepository.findById() can't find group", depositEntryDto.getGroupId());
             throw ApplicationError.Conflict(depositEntryDto.getGroupId() + " non-existent group");
         }
@@ -77,7 +77,7 @@ public class Entry implements IEntryService {
 
         // Upload to Minio
         CallResult<String> photoEvidence = CallWrapper.syncCall(() -> this.uploadFile(depositEntryDto.getPhoto(), fullName));
-        if(photoEvidence.isFailure()){
+        if (photoEvidence.isFailure()) {
             logger.error("Entry#addEntry(): this.uploadFile() failed", photoEvidence.getError());
             throw ApplicationError.InternalError(photoEvidence.getError());
         }
@@ -85,7 +85,7 @@ public class Entry implements IEntryService {
         entriesEntity.setPhotoEvidence(photoEvidence.getResult());
 
         CallResult<EntriesEntity> depositoryAmount = CallWrapper.syncCall(() -> this.entryRepository.save(entriesEntity));
-        if(depositoryAmount.isFailure()){
+        if (depositoryAmount.isFailure()) {
             logger.error("Entry#addEntry(): this.entryRepository.save() failed", depositoryAmount.getError());
             throw ApplicationError.InternalError(depositoryAmount.getError());
         }
@@ -99,7 +99,7 @@ public class Entry implements IEntryService {
         entry.setGroupId(depositEntryDto.getGroupId());
 
         CallResult<UserEntriesEntity> userEntries = CallWrapper.syncCall(() -> this.userEntriesRepository.save(entry));
-        if(depositoryAmount.isFailure()){
+        if (depositoryAmount.isFailure()) {
             logger.error("Entry#addEntry(): this.userEntriesRepository.save() failed", userEntries.getError());
             throw ApplicationError.InternalError(userEntries.getError());
         }

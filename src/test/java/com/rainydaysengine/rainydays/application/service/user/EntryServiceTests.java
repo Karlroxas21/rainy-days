@@ -57,7 +57,7 @@ public class EntryServiceTests {
     @BeforeEach
     public void init() {
 
-         this.mockFile = new MockMultipartFile(
+        this.mockFile = new MockMultipartFile(
                 "photo",
                 "test-image.jpg",
                 "image/jpeg",
@@ -76,7 +76,7 @@ public class EntryServiceTests {
 
     @SneakyThrows
     @Test
-    public void EntryService_AddEntry_ReturnsString(){
+    public void EntryService_AddEntry_ReturnsString() {
 
         // In real code, JPA would auto-generate the 'id' on save() but in test, we need to
         // simulate that.
