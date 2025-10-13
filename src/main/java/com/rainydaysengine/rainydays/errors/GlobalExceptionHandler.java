@@ -21,7 +21,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorDetails> handleGenericError(Exception ex) {
         return new ResponseEntity<>(
-                new ErrorDetails("INTERNAL_ERROR", ex.getMessage(),
+                new ErrorDetails(HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage(),
                         HttpStatus.INTERNAL_SERVER_ERROR,
                         null,
                         null),

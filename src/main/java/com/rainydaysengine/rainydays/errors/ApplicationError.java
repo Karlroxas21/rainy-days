@@ -15,7 +15,7 @@ public class ApplicationError extends RuntimeException {
 
     public static ApplicationError InternalError(Object details) {
         return new ApplicationError(new ErrorDetails(
-                "INTERNAL_ERROR",
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Internal Error",
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 details,
@@ -30,7 +30,7 @@ public class ApplicationError extends RuntimeException {
 
     public static ApplicationError BadRequest(Object details) {
         return new ApplicationError(new ErrorDetails(
-                "BAD_REQUEST",
+                HttpStatus.BAD_REQUEST.value(),
                 "Bad Request",
                 HttpStatus.BAD_REQUEST,
                 details,
@@ -41,7 +41,7 @@ public class ApplicationError extends RuntimeException {
 
     public static ApplicationError Unauthorized(Object details) {
         return new ApplicationError(new ErrorDetails(
-                "UNAUTHORIZED",
+                HttpStatus.UNAUTHORIZED.value(),
                 "Unauthorized Request",
                 HttpStatus.UNAUTHORIZED,
                 details,
@@ -52,7 +52,7 @@ public class ApplicationError extends RuntimeException {
 
     public static ApplicationError NotFound(Object details) {
         return new ApplicationError(new ErrorDetails(
-                "NOT_FOUND",
+                HttpStatus.NOT_FOUND.value(),
                 "Not Found",
                 HttpStatus.NOT_FOUND,
                 details,
@@ -63,7 +63,7 @@ public class ApplicationError extends RuntimeException {
 
     public static ApplicationError Conflict(Object details) {
         return new ApplicationError(new ErrorDetails(
-                "CONFLICT",
+                HttpStatus.CONFLICT.value(),
                 "Duplicate",
                 HttpStatus.FORBIDDEN,
                 details,
@@ -72,13 +72,13 @@ public class ApplicationError extends RuntimeException {
         );
     }
 
-    public static ApplicationError tooManyRequest(String message, Object details) {
+    public static ApplicationError tooManyRequest(String message, long seconds) {
         return new ApplicationError(new ErrorDetails(
-                "TOO_MANY_REQUESTS",
+                HttpStatus.TOO_MANY_REQUESTS.value(),
                 message,
                 HttpStatus.TOO_MANY_REQUESTS,
-                details,
-                null
+                null,
+                seconds
         )
         );
     }
