@@ -1,7 +1,3 @@
-### Setting-up environment
-- `make docker-up` to run containers
-- Wait atleast 2 minutes to finish db migrations.
-
 # RainyDays Backend Service
 An emergency Fund manual tracker for you and your loved ones - building your safety net.
 
@@ -40,31 +36,28 @@ Original idea was from Karl Marx Roxas (me) and I asked my former college classm
 - JDK 21.0.2
 - IntelliJ IDEA/VSCode
 - Postman
-- Clean Architecture combined with Ports & Adapters
-
+- Make
 
 ### Getting Started
+- `make docker-up` to run containers
+- Wait at least 2 minutes to finish db migrations.
+- Start the server or enter `make start` in terminal
 
 #### Folder Structure
-- **kratos** - contains kratos configuration
-- **misc** - miscellaneous files like schemas, templates
-- **domain** - contains domain components
-  - **port** - port interfaces/records that being injected in Service and implemented in Infra
-  - **service** - service layer
-- **config** - contains configurations beans 
-- **errors** - contains custom errors and global exception
-- **infra** - contains infra services like psql, kratos, redis, and minio 
-- **interfaces** - controller layer
-  - **web** - REST Endpoints
-- **utils** - contains helpers and utilities
-- **resources** - contains resources
-  - **db/changelog** - Liquibase changelog and Initial SQL Structure
-  - **db.config** - Liquibase Properties and initial databases
+- **application** - contains components services & ports
+- **config** - contains different configurations
+- **errors** - contains custom error handling and global errors
+- **infra** - contains all different services running independently
+- **interfaces.web** - contains all REST endpoints or controllers
+- **utils** - contains all utilities/helpers
+- **resources.db.changelog** - Liquibase changelog and Initial SQL Structure
+- **resources.db.config** - Liquibase Properties and initial databases
+- **test** - contains all unit test cases (infra, service, and controller)
 
 ### Configuration
 
 ### API Endpoints
+- Run the server and go to `http://localhost:8080/swagger-ui/index.html#/` to see the OpenAPI definition or go to `docs` folder to open postman collection.
 
 ### Contributing
-
-### License
+- Email to `karlm.roxa@gmail.com` or just make a PR following the template
