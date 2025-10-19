@@ -19,6 +19,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -105,6 +107,22 @@ public class Entry implements IEntryService {
         }
 
         return userEntries.getResult().getId().toString();
+    }
+
+    /**
+     * @param userId
+     * @return RecentEntriesResponse
+     */
+    @Override
+    public Page<RecentEntriesResponse> recentEntries(String userId, String search, Pageable pageable) {
+        CallResult<Page<RecentEntriesResponse>> userEntries =
+                CallWrapper.syncCall(() -> this.userEntriesRepository.findAllRecentEntriesByUserId(UUID.fromString(userId), search, pageable));
+        if (userEntries.isFailure()) {
+            logger.error("Entry#recentEntries(): this.userEntriesRepository.findAllRecentEntriesByUserId() failed",
+                    userEntries.getError());
+        }
+
+        return userEntries.getResult();
     }
 
     private String uploadFile(MultipartFile file, String user) throws Exception {

@@ -12,14 +12,13 @@ public class IpRateLimiter {
     private final ProxyManager<String> proxyManager;
     private final BucketConfiguration configuration;
 
-    @Value("${ratelimit.max}")
-    private int MAX_REQUEST_PER_MINUTE;
-
-
-    public IpRateLimiter(ProxyManager<String> proxyManager) {
+    // Injecting MAX_REQUEST_PER_MINUTE value in constructor because
+    // @Value injection happens after the contrusctor is called.
+    public IpRateLimiter(ProxyManager<String> proxyManager,
+                         @Value("${ratelimit.max}") int MAX_REQUEST_PER_MINUTE) {
         this.proxyManager = proxyManager;
         this.configuration = BucketConfiguration.builder()
-                .addLimit(Bandwidth.classic(MAX_REQUEST_PER_MINUTE, Refill.intervally(1, Duration.ofMinutes(1))))
+                .addLimit(Bandwidth.classic(MAX_REQUEST_PER_MINUTE, Refill.intervally(MAX_REQUEST_PER_MINUTE, Duration.ofMinutes(1))))
                 .build();
     }
 

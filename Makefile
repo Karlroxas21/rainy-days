@@ -46,3 +46,9 @@ migrate-history:
 ## Reload Maven
 mvn-clean-resolve:
 	mvn clean dependency:resolve
+
+package-skip-test:
+	 mvn clean package -DskipTests
+
+run-jar:
+	java -jar target/rainydays-0.0.1-SNAPSHOT.jar
