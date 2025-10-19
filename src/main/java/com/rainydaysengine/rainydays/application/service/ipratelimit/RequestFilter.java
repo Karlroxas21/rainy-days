@@ -15,11 +15,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-@RequiredArgsConstructor
 @Component
 public class RequestFilter extends OncePerRequestFilter {
 
     private final IpRateLimiter ipRateLimiter;
+
+    public RequestFilter(IpRateLimiter ipRateLimiter) {
+        this.ipRateLimiter = ipRateLimiter;
+    }
 
     /**
      * @param request
@@ -42,6 +45,7 @@ public class RequestFilter extends OncePerRequestFilter {
 
             // isConsumed() -> true if request is allowed (token successfully taken)
             // false if rate limit is exceeded (no tokens left)
+            // System.out.println("Remaining token: " + probe.getRemainingTokens());
             if (!probe.isConsumed()) {
                 // Too many request
                 long waitForNanoSeconds = probe.getNanosToWaitForRefill();
