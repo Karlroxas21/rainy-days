@@ -52,5 +52,3 @@ package-skip-test:
 
 run-jar:
 	java -jar target/rainydays-0.0.1-SNAPSHOT.jar
-
-test
