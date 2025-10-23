@@ -1,5 +1,6 @@
 package com.rainydaysengine.rainydays.infra.postgres.repository;
 
+import com.rainydaysengine.rainydays.application.service.entry.EntryResponse;
 import com.rainydaysengine.rainydays.application.service.entry.RecentEntriesResponse;
 import com.rainydaysengine.rainydays.infra.postgres.entity.UserEntriesEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -35,4 +36,26 @@ public interface UserEntriesRepository extends JpaRepository<UserEntriesEntity, 
                  )
            """)
     Page<RecentEntriesResponse> findAllRecentEntriesByUserId(@Param("userId") UUID userId, @Param("search") String search, Pageable pageable);
+
+    @Query("""
+           SELECT
+                e.id,
+                e.amount,
+                e.notes,
+                e.photoEvidence,
+                e.createdAt,
+                e.updatedAt,
+                g.id,
+                g.groupName
+           FROM
+                UserEntriesEntity ue
+                JOIN EntriesEntity e ON ue.entryId = e.id
+                JOIN GroupEntity g ON ue.groupId = g.id
+           WHERE
+                ue.entryId = :entryId 
+           AND 
+                ue.userId = :userId
+           """)
+    Optional<EntryResponse> findEntryById(@Param("entryId") UUID entryId, @Param("userId") UUID userId);
+
 }
