@@ -114,15 +114,33 @@ public class Entry implements IEntryService {
      * @return RecentEntriesResponse
      */
     @Override
-    public Page<RecentEntriesResponse> recentEntries(String userId, String search, Pageable pageable) {
+    public Page<RecentEntriesResponse> recentEntriesByUserId(String userId, String search, Pageable pageable) {
         CallResult<Page<RecentEntriesResponse>> userEntries =
                 CallWrapper.syncCall(() -> this.userEntriesRepository.findAllRecentEntriesByUserId(UUID.fromString(userId), search, pageable));
         if (userEntries.isFailure()) {
             logger.error("Entry#recentEntries(): this.userEntriesRepository.findAllRecentEntriesByUserId() failed",
                     userEntries.getError());
+            throw ApplicationError.InternalError(userEntries.getError());
         }
 
         return userEntries.getResult();
+    }
+
+    /**
+     * @param entryId
+     * @Param userId
+     * @return EntryResponse
+     */
+    @Override
+    public EntryResponse findEntry(String entryId, String userId) {
+        CallResult<Optional<EntryResponse>> entry =
+                CallWrapper.syncCall(() -> this.userEntriesRepository.findEntryById(UUID.fromString(entryId), UUID.fromString(userId)));
+        if (entry.isFailure()) {
+            logger.error("Entry#recentEntries(): this.userEntriesRepository.findEntryById() failed", entry.getError());
+            throw ApplicationError.InternalError(entry.getError());
+        }
+
+        return entry.getResult().get();
     }
 
     private String uploadFile(MultipartFile file, String user) throws Exception {

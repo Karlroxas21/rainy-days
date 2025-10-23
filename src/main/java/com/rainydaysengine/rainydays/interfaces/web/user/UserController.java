@@ -4,7 +4,9 @@ import com.rainydaysengine.rainydays.application.port.auth.Session;
 
 import com.rainydaysengine.rainydays.application.service.entry.DepositEntryDto;
 import com.rainydaysengine.rainydays.application.service.entry.Entry;
+import com.rainydaysengine.rainydays.application.service.entry.EntryResponse;
 import com.rainydaysengine.rainydays.application.service.entry.RecentEntriesResponse;
+import com.rainydaysengine.rainydays.application.service.pagination.PaginationResponse;
 import com.rainydaysengine.rainydays.application.service.user.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -81,8 +83,10 @@ public class UserController {
         return ResponseEntity.ok("File uploaded successfully: " + file.getOriginalFilename());
     }
 
+    // param options: sort=<value>,desc|asc
+    // page, size, search=value
     @GetMapping(value = "/{userId}/entries")
-    public ResponseEntity<Map<String, Object>> getRecentEntriesByUserId(
+    public ResponseEntity<PaginationResponse<RecentEntriesResponse>> getRecentEntriesByUserId(
             @PathVariable String userId,
             @RequestParam(required = false) String search,
             @PageableDefault(page = 0, size =  DEFAULT_PAGE_SIZE, direction = Sort.Direction.DESC)
@@ -90,15 +94,38 @@ public class UserController {
     ) {
         String searchValue = (search == null || search.isBlank()) ? "" : search;
 
-        Page<RecentEntriesResponse> userEntries = entry.recentEntries(userId, searchValue, pageable);
+        Page<RecentEntriesResponse> userEntries = entry.recentEntriesByUserId(userId, searchValue, pageable);
 
-        Map<String, Object> res = Map.of(
-                "data", userEntries.getContent(),
-                "currentPage", userEntries.getNumber(),
-                "totalItems", userEntries.getTotalElements(),
-                "totalPages", userEntries.getTotalPages(),
-                "pageSize", userEntries.getSize(),
-                "sort", pageable.getSort().toString()
+        PaginationResponse<RecentEntriesResponse> res = new PaginationResponse<>(
+                userEntries.getContent(),
+                userEntries.getNumber(),
+                userEntries.getTotalElements(),
+                userEntries.getTotalPages(),
+                userEntries.getSize(),
+                pageable.getSort().toString()
+        );
+
+        return ResponseEntity.ok(res);
+    }
+
+    @GetMapping(value = "/{userId}/entries/{entryId}")
+    public ResponseEntity<EntryResponse> getEntryByEntryId(
+            @PathVariable String userId,
+            @PathVariable String entryId,
+            @PageableDefault(page = 0, size = DEFAULT_PAGE_SIZE, direction = Sort.Direction.DESC)
+            Pageable pageable
+    ) {
+        EntryResponse userEntry = entry.findEntry(entryId, userId);
+
+        EntryResponse res = new EntryResponse(
+                userEntry.entryId(),
+                userEntry.amount(),
+                userEntry.notes(),
+                userEntry.photoEvidence(),
+                userEntry.createdAt(),
+                userEntry.updatedAt(),
+                userEntry.groupId(),
+                userEntry.groupName()
         );
 
         return ResponseEntity.ok(res);
