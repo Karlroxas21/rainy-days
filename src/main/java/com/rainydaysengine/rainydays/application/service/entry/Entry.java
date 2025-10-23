@@ -3,7 +3,6 @@ package com.rainydaysengine.rainydays.application.service.entry;
 import com.rainydaysengine.rainydays.application.port.entry.IEntryPort;
 import com.rainydaysengine.rainydays.application.port.entry.IEntryService;
 import com.rainydaysengine.rainydays.errors.ApplicationError;
-import com.rainydaysengine.rainydays.infra.minio.Minio;
 import com.rainydaysengine.rainydays.infra.postgres.entity.EntriesEntity;
 import com.rainydaysengine.rainydays.infra.postgres.entity.GroupEntity;
 import com.rainydaysengine.rainydays.infra.postgres.entity.UserEntriesEntity;

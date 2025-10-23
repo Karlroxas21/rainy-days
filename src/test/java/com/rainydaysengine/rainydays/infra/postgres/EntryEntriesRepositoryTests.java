@@ -23,7 +23,6 @@ public class EntryEntriesRepositoryTests {
 
     @Test
     public void userEntriesRepository_Save_ReturnSavedUserEntries() {
-        UUID randomUuid = UUID.randomUUID();
 
         // Arrange
         UserEntriesEntity userEntries = UserEntriesEntity.builder()
