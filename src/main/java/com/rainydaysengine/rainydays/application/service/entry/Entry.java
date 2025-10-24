@@ -41,7 +41,7 @@ public class Entry implements IEntryService {
      * @param depositEntryDto
      * @return EntryId
      */
-    @Transactional
+    @Transactional // Spring handles the transactional.
     @Override
     public String addEntry(DepositEntryDto depositEntryDto) {
 

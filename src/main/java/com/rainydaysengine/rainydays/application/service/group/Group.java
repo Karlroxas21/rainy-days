@@ -3,7 +3,10 @@ package com.rainydaysengine.rainydays.application.service.group;
 import com.rainydaysengine.rainydays.application.port.group.IGroupService;
 import com.rainydaysengine.rainydays.errors.ApplicationError;
 import com.rainydaysengine.rainydays.infra.postgres.entity.GroupEntity;
+import com.rainydaysengine.rainydays.infra.postgres.entity.usersgroup.UsersGroupEntity;
+import com.rainydaysengine.rainydays.infra.postgres.entity.usersgroup.UsersGroupId;
 import com.rainydaysengine.rainydays.infra.postgres.repository.GroupRepository;
+import com.rainydaysengine.rainydays.infra.postgres.repository.UsersGroupRepository;
 import com.rainydaysengine.rainydays.utils.CallResult;
 import com.rainydaysengine.rainydays.utils.CallWrapper;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +23,7 @@ public class Group implements IGroupService {
     private static final Logger logger = LoggerFactory.getLogger(Group.class);
 
     private final GroupRepository groupRepository;
+    private final UsersGroupRepository usersGroupRepository;
 
     /**
      * @param groupDto
@@ -48,5 +52,27 @@ public class Group implements IGroupService {
             throw ApplicationError.InternalError(savedGroupEntity.getError());
         }
         return savedGroupEntity.getResult().getId();
+    }
+
+    @Override
+    public void addUserToGroup(UUID userId, UUID groupId){
+        UsersGroupId id = new UsersGroupId(userId, groupId);
+
+        // Check if User is already added to a group
+        CallResult<Optional<UsersGroupEntity>> isAlreadyExist = CallWrapper.syncCall(() -> this.usersGroupRepository.findById(id));
+        if (isAlreadyExist.getResult().isPresent()) {
+            logger.error("Group#addUserToGroup(): this.usersGroupRepository.findById() user already added in group");
+            throw ApplicationError.Conflict("user: " + userId + " is already added in group " + groupId);
+        }
+
+        UsersGroupEntity usersGroupEntity = new UsersGroupEntity();
+        usersGroupEntity.setUserId(userId);
+        usersGroupEntity.setGroupId(groupId);
+
+        CallResult<UsersGroupEntity> savedUserToGroup = CallWrapper.syncCall(() -> this.usersGroupRepository.save(usersGroupEntity));
+        if (savedUserToGroup.isFailure()) {
+            logger.error("Group#addUserToGroup(): this.usersGroupRepository.save() failed", savedUserToGroup.getError());
+            throw ApplicationError.InternalError(savedUserToGroup.getError());
+        }
     }
 }

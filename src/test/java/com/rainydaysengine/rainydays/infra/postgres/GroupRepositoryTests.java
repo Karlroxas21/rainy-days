@@ -23,7 +23,6 @@ public class GroupRepositoryTests {
 
     @Test
     public void groupRepository_Save_ReturnSavedGroup() {
-        UUID randomUuid = UUID.randomUUID();
 
         // Arrange
         GroupEntity groupEntity = GroupEntity.builder()
