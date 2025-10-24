@@ -6,4 +6,5 @@ import java.util.UUID;
 
 public interface IGroupService {
     UUID createNewGroup(GroupDto groupDto);
+    void addUserToGroup(UUID userId, UUID groupId);
 }
