@@ -1,0 +1,512 @@
+{
+	"info": {
+		"_postman_id": "60092823-8b7b-4593-8a2b-be2bb96b8392",
+		"name": "rainydays",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "40110647"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register - Success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('authentication#register => success', () => {\r",
+									"    pm.expect(pm.response).status(201)\r",
+									"    const { name, email, username, first_name, middle_name, last_name } = pm.response.json()\r",
+									"    pm.environment.set('user-name', name)\r",
+									"    pm.environment.set('user-email', email.toLowerCase())\r",
+									"    pm.environment.set('user-username', username.toLowerCase())\r",
+									"    pm.environment.set('user-first_name', first_name)\r",
+									"    pm.environment.set('user-middle_name', middle_name)\r",
+									"    pm.environment.set('user-last-name', last_name)\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"yen@yen.ai\",\r\n    \"username\": \"yen\",\r\n    \"first_name\": \"Cath\",\r\n    \"middle_name\": \"TM\",\r\n    \"last_name\": \"Martinez\",\r\n    \"password\": \"tTes@31t@1\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/v1/user/register",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"v1",
+								"user",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login - Success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('authentication#login => success', () => {\r",
+									"    pm.expect(pm.response).status(200)\r",
+									"    const { traits, token, expirt } = pm.response.json()\r",
+									"    pm.environment.set('user-name', traits.first_name)\r",
+									"    pm.environment.set('user-middle_name', traits.middle_name ?? '')\r",
+									"    pm.environment.set('user-last_name', traits.last_name)\r",
+									"        pm.environment.set('user-email', traits.email)\r",
+									"    pm.environment.set('token', token)\r",
+									"    pm.environment.set('expiry', expiry)\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "User-Id",
+								"value": "0a4dfe5e-9d80-4750-881f-0d27264c0319",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"identifier\": \"karlmarx@nmblr.ai\",\r\n    \"password\": \"tTes@31t@1\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/v1/user/login",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"v1",
+								"user",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "whoami",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('authentication#whoami => success', () => {\r",
+									"    pm.expect(pm.response).status(200)\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "jmQQea_GoHqz9oDQ3qaypg",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"session_token\": \"{{token}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/v1/user/whoami",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"v1",
+								"user",
+								"whoami"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('authentication#whoami => success', () => {\r",
+									"    pm.expect(pm.response).status(204)\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"identity\": \"kroxas@nmblr.ai\",\r\n    \"password\": \"Password@2\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/v1/user/reset-password",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"v1",
+								"user",
+								"reset-password"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Entry",
+			"item": [
+				{
+					"name": "Add Entry - Success",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "photo",
+									"type": "file",
+									"src": "/F:/Pictures/image_test.webp"
+								},
+								{
+									"key": "userId",
+									"value": "a5302e2b-a815-49a6-8247-adec23545865",
+									"type": "text"
+								},
+								{
+									"key": "amount",
+									"value": "500",
+									"type": "text"
+								},
+								{
+									"key": "note",
+									"value": "Yen",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "note",
+									"value": "Yen",
+									"type": "text"
+								},
+								{
+									"key": "groupId",
+									"value": "1c95ea3b-d803-4425-b1b2-b4c6f2a0dd91",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base-url}}/v1/user/add-entry",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"v1",
+								"user",
+								"add-entry"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Photo - Success",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{base-url}}/v1/user/add-photo",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"v1",
+								"user",
+								"add-photo"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Users Entries",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base-url}}/v1/user/:userId/entries",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"v1",
+								"user",
+								":userId",
+								"entries"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0",
+									"disabled": true
+								},
+								{
+									"key": "size",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "createdAt,asc",
+									"disabled": true
+								}
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "9f5ffc14-bbf8-4248-914b-990ea4c3315b"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "New Request",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base-url}}/v1/user/:userId/entries",
+									"host": [
+										"{{base-url}}"
+									],
+									"path": [
+										"v1",
+										"user",
+										":userId",
+										"entries"
+									],
+									"variable": [
+										{
+											"key": "userId",
+											"value": "9f5ffc14-bbf8-4248-914b-990ea4c3315b"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 19 Oct 2025 09:24:26 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": [\n        {\n            \"entryId\": \"27898994-79cb-4b8f-90c3-4ad263cd1372\",\n            \"entryAmount\": 5000,\n            \"entryPhoto\": \"Karl\",\n            \"entryNotes\": \"app/entries/karl_entry_10-18-25-12-29-50.jpeg\",\n            \"groupId\": \"f5a93bee-faee-48d8-b40f-1fa700da497a\",\n            \"groupName\": \"Wedding\"\n        },\n        {\n            \"entryId\": \"f4cccfc1-71f5-431a-98cf-6c4cb19e9b34\",\n            \"entryAmount\": 5000,\n            \"entryPhoto\": \"Karl\",\n            \"entryNotes\": \"app/entries/karl_entry_10-19-25-08-02-19.jpeg\",\n            \"groupId\": \"1c95ea3b-d803-4425-b1b2-b4c6f2a0dd91\",\n            \"groupName\": \"End-Game PC\"\n        }\n    ],\n    \"sort\": \"UNSORTED\",\n    \"totalItems\": 2,\n    \"totalPages\": 1,\n    \"pageSize\": 5,\n    \"currentPage\": 0\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Entry By EntryId",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base-url}}/v1/user/:userId/entries/:entryId",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"v1",
+								"user",
+								":userId",
+								"entries",
+								":entryId"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "9f5ffc14-bbf8-4248-914b-990ea4c3315b"
+								},
+								{
+									"key": "entryId",
+									"value": "f4cccfc1-71f5-431a-98cf-6c4cb19e9b34"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Group",
+			"item": [
+				{
+					"name": "Add Group - Success",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"groupName\": \"End-Game PC\",\r\n    \"combinedGoal\": 1000000\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base-url}}/v1/group/create-group",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"v1",
+								"group",
+								"create-group"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add User to Group",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base-url}}/v1/group/:groupid/user/:userId",
+							"host": [
+								"{{base-url}}"
+							],
+							"path": [
+								"v1",
+								"group",
+								":groupid",
+								"user",
+								":userId"
+							],
+							"query": [
+								{
+									"key": "groupId",
+									"value": "1c95ea3b-d803-4425-b1b2-b4c6f2a0dd91",
+									"disabled": true
+								},
+								{
+									"key": "userId",
+									"value": "9f5ffc14-bbf8-4248-914b-990ea4c3315b",
+									"disabled": true
+								}
+							],
+							"variable": [
+								{
+									"key": "groupid",
+									"value": "1c95ea3b-d803-4425-b1b2-b4c6f2a0dd91"
+								},
+								{
+									"key": "userId",
+									"value": "9f5ffc14-bbf8-4248-914b-990ea4c3315b"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base-url",
+			"value": "",
+			"type": "default"
+		}
+	]
+}
