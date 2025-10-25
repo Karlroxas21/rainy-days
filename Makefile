@@ -47,8 +47,18 @@ migrate-history:
 mvn-clean-resolve:
 	mvn clean dependency:resolve
 
+## Build Spring Boot
 package-skip-test:
 	 mvn clean package -DskipTests
 
+## Run Build files
 run-jar:
 	java -jar target/rainydays-0.0.1-SNAPSHOT.jar
+
+## Build docker file
+docker-build:
+	docker build -t rainydays-service .
+
+## Run Docker Image
+docker-run:
+	docker run -p 8080:8080 rainydays-service
