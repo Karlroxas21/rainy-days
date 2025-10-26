@@ -2,6 +2,7 @@ package com.rainydaysengine.rainydays.infra.postgres.repository;
 
 import com.rainydaysengine.rainydays.application.service.entry.EntryResponse;
 import com.rainydaysengine.rainydays.application.service.entry.RecentEntriesResponse;
+import com.rainydaysengine.rainydays.application.service.entry.TotalAmountContributedByUserResponse;
 import com.rainydaysengine.rainydays.infra.postgres.entity.UserEntriesEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,9 +13,12 @@ import org.springframework.data.domain.Pageable;
 import java.util.Optional;
 import java.util.UUID;
 
+@SuppressWarnings("checkstyle:MissingJavadocType")
 public interface UserEntriesRepository extends JpaRepository<UserEntriesEntity, UUID> {
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     Optional<UserEntriesEntity> findByUserId(UUID uuid);
 
+    @SuppressWarnings({"checkstyle:LineLength", "checkstyle:MissingJavadocMethod"})
     @Query("""
             SELECT
                 e.id,
@@ -52,7 +56,7 @@ public interface UserEntriesRepository extends JpaRepository<UserEntriesEntity, 
                 JOIN EntriesEntity e ON ue.entryId = e.id
                 JOIN GroupEntity g ON ue.groupId = g.id
            WHERE
-                ue.entryId = :entryId 
+                ue.entryId = :entryId
            AND 
                 ue.userId = :userId
            """)
@@ -60,30 +64,35 @@ public interface UserEntriesRepository extends JpaRepository<UserEntriesEntity, 
 
 
     // Select and total amount of contributed by user in group
-//     SELECT 
-// 	g.group_name,
-// 	g.combined_goal,
-// 	u.first_name,
-// 	u.middle_name,
-// 	u.last_name,
-// 	u.suffix,
-// 	u.profile_url,
-// 	COALESCE(SUM(e.amount), 0) AS total
-// FROM user_entries ue 
-// LEFT JOIN entries e ON ue.entry_id = e.id
-// LEFT JOIN users u ON  ue.user_id = u.id
-// LEFT JOIN groups g ON ue.group_id = g.id
-// where 
-// 	ue.user_id='9f5ffc14-bbf8-4248-914b-990ea4c3315b'
-// and
-// 	group_id='1c95ea3b-d803-4425-b1b2-b4c6f2a0dd91'
-// GROUP BY 
-//     g.group_name,  -- You must group by all the other columns you are selecting
-//     g.combined_goal,
-//     u.first_name,
-//     u.middle_name,
-//     u.last_name,
-//     u.suffix,
-//     u.profile_url;
-
+    @Query("""
+           SELECT
+                g.groupName,
+                g.combinedGoal,
+                u.firstName,
+                u.middleName,
+                u.lastName,
+                u.suffix,
+                u.profileUrl,
+                COALESCE(SUM(e.amount), 0) AS total
+           FROM
+                UserEntriesEntity ue
+           LEFT JOIN
+                EntriesEntity e ON ue.entryId = e.id
+           LEFT JOIN
+                UsersEntity u ON ue.userId = u.id
+           LEFT JOIN
+                GroupEntity g ON ue.groupId = g.id
+           WHERE
+                ue.userId = :userId
+           AND
+                ue.groupId = :groupId
+           GROUP BY
+                g.groupName,
+                u.firstName,
+                u.middleName,
+                u.lastName,
+                u.suffix,
+                u.profileUrl
+           """)
+    TotalAmountContributedByUserResponse findTotalAmountContributedByUser(@Param("userId") UUID userId, @Param("groupId") UUID groupId);
 }

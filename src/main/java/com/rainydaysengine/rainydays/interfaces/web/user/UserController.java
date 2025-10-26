@@ -2,10 +2,7 @@ package com.rainydaysengine.rainydays.interfaces.web.user;
 
 import com.rainydaysengine.rainydays.application.port.auth.Session;
 
-import com.rainydaysengine.rainydays.application.service.entry.DepositEntryDto;
-import com.rainydaysengine.rainydays.application.service.entry.Entry;
-import com.rainydaysengine.rainydays.application.service.entry.EntryResponse;
-import com.rainydaysengine.rainydays.application.service.entry.RecentEntriesResponse;
+import com.rainydaysengine.rainydays.application.service.entry.*;
 import com.rainydaysengine.rainydays.application.service.pagination.PaginationResponse;
 import com.rainydaysengine.rainydays.application.service.user.*;
 import jakarta.validation.Valid;
@@ -21,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.ws.rs.Path;
 import java.util.concurrent.CompletableFuture;
 
 @RequiredArgsConstructor
@@ -126,6 +124,27 @@ public class UserController {
                 userEntry.groupId(),
                 userEntry.groupName()
         );
+
+        return ResponseEntity.ok(res);
+    }
+
+    @GetMapping(value = "/{userId}/group/{groupId}/total")
+    public ResponseEntity<TotalAmountContributedByUserResponse> getTotalAmountContributedByUser(
+            @PathVariable String userId,
+            @PathVariable String groupId) {
+        TotalAmountContributedByUserResponse total = entry.findTotalAmountContributedByUser(userId, groupId);
+
+        TotalAmountContributedByUserResponse res = new TotalAmountContributedByUserResponse(
+                total.groupName(),
+                total.combinedGoal(),
+                total.firstName(),
+                total.middleName(),
+                total.lastName(),
+                total.suffix(),
+                total.profileUrl(),
+                total.total()
+        );
+        // TODO: Fix  "message": "Cannot invoke \"com.rainydaysengine.rainydays.application.service.entry.TotalAmountContributedByUserResponse.groupName()\" because \"total\" is null",
 
         return ResponseEntity.ok(res);
     }
