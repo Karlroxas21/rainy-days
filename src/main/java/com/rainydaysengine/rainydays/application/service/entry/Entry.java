@@ -142,6 +142,50 @@ public class Entry implements IEntryService {
         return entry.getResult().get();
     }
 
+    /**
+     * @param userId
+     * @param groupId
+     * @return TotalAmountContributedByUserResponse
+     */
+    @Override
+    public TotalAmountContributedByUserResponse findTotalAmountContributedByUser(String userId, String groupId) {
+        // Check if userId is present
+        CallResult<Optional<UsersEntity>> isValidUser = CallWrapper.syncCall(() -> this.userRepository.findById(UUID.fromString(userId)));
+        if (isValidUser.getResult().isEmpty()) {
+            logger.error("Entry#findTotalAmountContributedByUser(): this.userRepository.findById() no user found", userId);
+            throw ApplicationError.NotFound(userId);
+        }
+        if (isValidUser.isFailure()) {
+            logger.error("Entry#findTotalAmountContributedByUser(): this.userRepository.findById() failed", isValidUser.getError());
+            throw ApplicationError.InternalError(isValidUser.getError());
+        }
+
+        // Check if group is valid
+        CallResult<Optional<GroupEntity>> isValidGroup = CallWrapper.syncCall(() -> this.groupRepository.findById(UUID.fromString(groupId)));
+        if (isValidGroup.getResult().isEmpty()) {
+            logger.error("Entry#findTotalAmountContributedByUser(): this.groupRepository.findById() no entry found", groupId);
+            throw ApplicationError.NotFound(groupId);
+        }
+        if (isValidGroup.isFailure()) {
+            logger.error("Entry#findTotalAmountContributedByUser(): this.groupRepository.findById() failed", isValidGroup.getError());
+            throw ApplicationError.InternalError(isValidGroup.getError());
+        }
+
+        // findTotalAmountContributedByUser
+        CallResult<Optional<TotalAmountContributedByUserResponse>> totalContribution =
+                CallWrapper.syncCall(() -> this.userEntriesRepository.findTotalAmountContributedByUser(UUID.fromString(userId), UUID.fromString(groupId)));
+        if (totalContribution.isFailure()) {
+            logger.error("Entry#findTotalAmountContributedByUser(): this.userEntriesRepository.findTotalAmountContributedByUser() failed", totalContribution.getError());
+            throw ApplicationError.InternalError(totalContribution.getError());
+        }
+        if (totalContribution.getResult().isEmpty()) {
+            logger.info("No contribution found for user {} in group {}", userId, groupId);
+            throw ApplicationError.NotFound("No contribution found for user" + userId + " in group " + groupId);
+        }
+        return totalContribution.getResult().get();
+    }
+
+
     private String uploadFile(MultipartFile file, String user) throws Exception {
         String renamedFile = RenameFile.rename(file, "karl");
         String objectName = "app/entries/" + renamedFile;
