@@ -18,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.ws.rs.Path;
 import java.util.concurrent.CompletableFuture;
 
 @RequiredArgsConstructor
@@ -144,8 +143,6 @@ public class UserController {
                 total.profileUrl(),
                 total.total()
         );
-        // TODO: Fix  "message": "Cannot invoke \"com.rainydaysengine.rainydays.application.service.entry.TotalAmountContributedByUserResponse.groupName()\" because \"total\" is null",
-
         return ResponseEntity.ok(res);
     }
 

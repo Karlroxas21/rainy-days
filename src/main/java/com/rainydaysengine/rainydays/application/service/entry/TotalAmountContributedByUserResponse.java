@@ -1,16 +1,15 @@
 package com.rainydaysengine.rainydays.application.service.entry;
 
-import lombok.Builder;
 
-@Builder
+import java.math.BigDecimal;
+
 public record TotalAmountContributedByUserResponse(
-        String groupName,
-        int combinedGoal,
-        String firstName,
-        String middleName,
-        String lastName,
-        String suffix,
-        String profileUrl,
-        int total
-) {
-}
+    String groupName,
+    Long combinedGoal,
+    String firstName,
+    String middleName,
+    String lastName,
+    String suffix,
+    String profileUrl,
+    BigDecimal total
+) {}

@@ -172,14 +172,17 @@ public class Entry implements IEntryService {
         }
 
         // findTotalAmountContributedByUser
-        CallResult<TotalAmountContributedByUserResponse> totalContribution =
+        CallResult<Optional<TotalAmountContributedByUserResponse>> totalContribution =
                 CallWrapper.syncCall(() -> this.userEntriesRepository.findTotalAmountContributedByUser(UUID.fromString(userId), UUID.fromString(groupId)));
-
-        if(totalContribution == null) {
+        if (totalContribution.isFailure()) {
+            logger.error("Entry#findTotalAmountContributedByUser(): this.userEntriesRepository.findTotalAmountContributedByUser() failed", totalContribution.getError());
+            throw ApplicationError.InternalError(totalContribution.getError());
+        }
+        if (totalContribution.getResult().isEmpty()) {
             logger.info("No contribution found for user {} in group {}", userId, groupId);
             throw ApplicationError.NotFound("No contribution found for user" + userId + " in group " + groupId);
         }
-        return totalContribution.getResult();
+        return totalContribution.getResult().get();
     }
 
 
