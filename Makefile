@@ -61,4 +61,4 @@ docker-build:
 
 ## Run Docker Image
 docker-run:
-	docker run -p 8080:8080 rainydays-service 
+	docker run -p 8080:8080 rainydays-service
