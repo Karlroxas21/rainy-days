@@ -1,8 +1,11 @@
 package com.rainydaysengine.rainydays.infra.postgres.repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.rainydaysengine.rainydays.application.service.entry.groupstatistics.GroupProgress;
+import com.rainydaysengine.rainydays.application.service.entry.groupstatistics.MemberRanking;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -64,8 +67,7 @@ public interface UserEntriesRepository extends JpaRepository<UserEntriesEntity, 
            """)
     Optional<EntryResponse> findEntryById(@Param("entryId") UUID entryId, @Param("userId") UUID userId);
 
-
-    // Select and total amount of contributed by user in group
+    // Select total amount of contributed by user in group
     @NativeQuery("""
             SELECT
                 g.group_name,
@@ -98,4 +100,67 @@ public interface UserEntriesRepository extends JpaRepository<UserEntriesEntity, 
                 u.profile_url
            """)
     Optional<TotalAmountContributedByUserResponse> findTotalAmountContributedByUser(@Param("userId") UUID userId, @Param("groupId") UUID groupId);
+
+    // Select Group Progress
+    @NativeQuery("""
+           SELECT
+                g.group_name,
+                g.combined_goal,
+                SUM(e.amount) as total
+           FROM
+                user_entries ue
+           LEFT JOIN
+                entries e on ue.entry_id = e.id
+           LEFT JOIN
+                groups g on ue.group_id = g.id
+           WHERE 
+                ue.group_id = :groupId
+           GROUP BY
+                g.group_name,
+                g.combined_goal
+           """)
+    Optional<GroupProgress> getGroupProgress(@Param("groupId") UUID groupId);
+
+//    Group Total in current month
+    @NativeQuery("""
+            SELECT
+                g.group_name,
+                g.combined_goal,
+                SUM(e.amount) AS total
+            FROM
+                user_entries ue
+            LEFT JOIN
+                entries e ON ue.entry_id = e.id
+            LEFT JOIN
+                users u ON ue.user_id = u.id
+            LEFT JOIN
+                groups g ON ue.group_id = g.id
+            WHERE
+                ue.group_id = :groupId
+            AND
+                ue.created_at >= DATE_TRUNC('month', CURRENT_DATE)
+            AND
+                ue.created_at < DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month'
+            GROUP BY
+                g.group_name,
+                g.combined_goal
+            """)
+    Optional<GroupProgress> getGroupTotalInCurrentMonth(@Param("groupId") UUID groupId);
+
+//    This month most_active or member_rankings(just get the first index)
+    @NativeQuery("""
+            SELECT
+                ue.user_id,
+                SUM(e.amount) as totalContribution
+            FROM
+                user_entries ue
+            LEFT JOIN
+                entries e on ue.entry_id = e.id
+            WHERE
+                ue.group_id = :groupId
+            GROUP BY
+                ue.user_id
+            """)
+    List<MemberRanking> getMemberRankingInCurrentMonth(@Param("groupId") UUID groupId);
+
 }

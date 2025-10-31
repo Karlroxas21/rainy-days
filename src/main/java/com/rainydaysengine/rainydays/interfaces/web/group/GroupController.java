@@ -1,5 +1,7 @@
 package com.rainydaysengine.rainydays.interfaces.web.group;
 
+import com.rainydaysengine.rainydays.application.service.entry.Entry;
+import com.rainydaysengine.rainydays.application.service.entry.groupstatistics.GroupStatisticResponse;
 import com.rainydaysengine.rainydays.application.service.group.Group;
 import com.rainydaysengine.rainydays.application.service.group.GroupDto;
 import com.rainydaysengine.rainydays.interfaces.web.user.UserController;
@@ -10,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.ws.rs.Path;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -20,6 +21,7 @@ public class GroupController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     private final Group group;
+    private final Entry entry;
 
     @PostMapping("/create-group")
     public ResponseEntity<UUID> createGroup(@RequestBody @Valid GroupDto groupDto) {
@@ -33,5 +35,12 @@ public class GroupController {
         this.group.addUserToGroup(UUID.fromString(userId), UUID.fromString(groupId));
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{groupId}/group-stat")
+    public ResponseEntity<GroupStatisticResponse> getGroupStatistics(@PathVariable String groupId) {
+        GroupStatisticResponse res = this.entry.getGroupStatistics(UUID.fromString(groupId));
+
+        return ResponseEntity.ok(res);
     }
 }

@@ -2,6 +2,9 @@ package com.rainydaysengine.rainydays.application.service.entry;
 
 import com.rainydaysengine.rainydays.application.port.entry.IEntryPort;
 import com.rainydaysengine.rainydays.application.port.entry.IEntryService;
+import com.rainydaysengine.rainydays.application.service.entry.groupstatistics.GroupProgress;
+import com.rainydaysengine.rainydays.application.service.entry.groupstatistics.GroupStatisticResponse;
+import com.rainydaysengine.rainydays.application.service.entry.groupstatistics.MemberRanking;
 import com.rainydaysengine.rainydays.errors.ApplicationError;
 import com.rainydaysengine.rainydays.infra.postgres.entity.EntriesEntity;
 import com.rainydaysengine.rainydays.infra.postgres.entity.GroupEntity;
@@ -23,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -185,6 +189,61 @@ public class Entry implements IEntryService {
         return totalContribution.getResult().get();
     }
 
+    /**
+     * @param groupId
+     * @return GroupStatisticResponse
+     */
+    @Override
+    public GroupStatisticResponse getGroupStatistics(UUID groupId) {
+        // Check if group is valid
+        CallResult<Optional<GroupEntity>> isValidGroup = CallWrapper.syncCall(() -> this.groupRepository.findById(groupId));
+        if (isValidGroup.getResult().isEmpty()) {
+            logger.error("Entry#getGroupStatistics(): this.groupRepository.findById() no entry found", groupId);
+            throw ApplicationError.NotFound(groupId);
+        }
+        if (isValidGroup.isFailure()) {
+            logger.error("Entry#getGroupStatistics(): this.groupRepository.findById() failed", isValidGroup.getError());
+            throw ApplicationError.InternalError(isValidGroup.getError());
+        }
+
+        // get Group Progress
+        CallResult<Optional<GroupProgress>> groupProgress =
+                CallWrapper.syncCall(() -> this.userEntriesRepository.getGroupProgress(groupId));
+        if (groupProgress.getResult().isEmpty()) {
+            logger.info("No group progress found in {} group\", groupId");
+        }
+        if (groupProgress.isFailure()) {
+            logger.error("Entry#getGroupStatistics(): this.userEntriesRepository.getGroupProgress()", groupProgress.getError());
+            throw ApplicationError.InternalError(groupProgress.getError());
+        }
+
+        // Get Group Progress in Current Month
+        CallResult<Optional<GroupProgress>> getGroupTotalInCurrentMonth =
+                CallWrapper.syncCall(() -> this.userEntriesRepository.getGroupTotalInCurrentMonth(groupId));
+        if (getGroupTotalInCurrentMonth.getResult().isEmpty()) {
+            logger.info("No group progress in current month found in {} group\", groupId");
+        }
+        if (getGroupTotalInCurrentMonth.isFailure()) {
+            logger.error("Entry#getGroupStatistics(): this.userEntriesRepository.getGroupTotalInCurrentMonth()", getGroupTotalInCurrentMonth.getError());
+            throw ApplicationError.InternalError(getGroupTotalInCurrentMonth.getError());
+        }
+
+        // Get Member Ranking
+        CallResult<List<MemberRanking>> getMemberRankingInCurrentMonth =
+                CallWrapper.syncCall(() -> this.userEntriesRepository.getMemberRankingInCurrentMonth(groupId));
+        if (getMemberRankingInCurrentMonth.isFailure()) {
+            logger.error("Entry#getGroupStatistics(): this.userEntriesRepository.getMemberRankingInCurrentMonth()", getMemberRankingInCurrentMonth.getError());
+            throw ApplicationError.InternalError(getMemberRankingInCurrentMonth.getError());
+        }
+
+        GroupStatisticResponse res = new GroupStatisticResponse(
+                groupProgress.getResult().get(),
+                getGroupTotalInCurrentMonth.getResult().get(),
+                getMemberRankingInCurrentMonth.getResult()
+        );
+
+        return res;
+    }
 
     private String uploadFile(MultipartFile file, String user) throws Exception {
         String renamedFile = RenameFile.rename(file, "karl");

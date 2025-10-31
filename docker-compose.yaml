@@ -4,30 +4,30 @@ networks:
 
 services:
 
-  app:
-    build: . # Build the Dockerfile in current directory
-    container_name: rainydays-service
-    profiles:
-      - dev
-    ports:
-      - "8080:8080"
-    depends_on:
-      - postgres
-      - redis
-      - ory-kratos
-      - minio
-    environment:
-      - POSTGRES_CONNECTION=jdbc:postgresql://postgres:5432/rainydays
-      - KRATOS_PUBLIC_BASE_URL=http://kratos:4433
-      - KRATOS_PRIVATE_BASE_URL=http://kratos:4434
-      - MINIO_BUCKET=files
-      - MINIO_ENDPOINT=http://minio:9000
-      - MINIO_ACCES_KEY=KARLADMIN
-      - MINIO_SECRET_KEY=KARLADMIN
-      - REDIS_HOST=redis://redis:6379
-      - MAX_REQUEST_PER_MINUTE=50
-    networks:
-      - rainydays
+#  app:
+#    build: . # Build the Dockerfile in current directory
+#    container_name: rainydays-service
+#    profiles:
+#      - dev
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      - postgres
+#      - redis
+#      - ory-kratos
+#      - minio
+#    environment:
+#      - POSTGRES_CONNECTION=jdbc:postgresql://postgres:5432/rainydays
+#      - KRATOS_PUBLIC_BASE_URL=http://kratos:4433
+#      - KRATOS_PRIVATE_BASE_URL=http://kratos:4434
+#      - MINIO_BUCKET=files
+#      - MINIO_ENDPOINT=http://minio:9000
+#      - MINIO_ACCES_KEY=KARLADMIN
+#      - MINIO_SECRET_KEY=KARLADMIN
+#      - REDIS_HOST=redis://redis:6379
+#      - MAX_REQUEST_PER_MINUTE=50
+#    networks:
+#      - rainydays
 
   postgres:
     image: postgres:17-alpine
