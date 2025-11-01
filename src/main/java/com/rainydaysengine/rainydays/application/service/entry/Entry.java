@@ -3,10 +3,10 @@ package com.rainydaysengine.rainydays.application.service.entry;
 import com.rainydaysengine.rainydays.application.port.entry.IEntryPort;
 import com.rainydaysengine.rainydays.application.port.entry.IEntryService;
 import com.rainydaysengine.rainydays.errors.ApplicationError;
-import com.rainydaysengine.rainydays.infra.postgres.entity.EntriesEntity;
-import com.rainydaysengine.rainydays.infra.postgres.entity.GroupEntity;
+import com.rainydaysengine.rainydays.infra.postgres.entity.entries.EntriesEntity;
 import com.rainydaysengine.rainydays.infra.postgres.entity.UserEntriesEntity;
 import com.rainydaysengine.rainydays.infra.postgres.entity.UsersEntity;
+import com.rainydaysengine.rainydays.infra.postgres.entity.entries.EntryType;
 import com.rainydaysengine.rainydays.infra.postgres.repository.EntryRepository;
 import com.rainydaysengine.rainydays.infra.postgres.repository.GroupRepository;
 import com.rainydaysengine.rainydays.infra.postgres.repository.UserEntriesRepository;
@@ -58,21 +58,10 @@ public class Entry implements IEntryService {
 
         String fullName = user.getResult().get().getFirstName().toLowerCase() + "_" + user.getResult().get().getLastName().toLowerCase();
 
-        // Verify if Group Exists
-        CallResult<Optional<GroupEntity>> existingGroup = CallWrapper.syncCall(() -> this.groupRepository.findById(depositEntryDto.getGroupId()));
-        if (existingGroup.isFailure()) {
-            logger.error("Entry#addEntry(): this.groupRepository.findById() failed", existingGroup.getError());
-            throw ApplicationError.InternalError(existingGroup.getError());
-        }
-
-        if (existingGroup.getResult().isEmpty()) {
-            logger.info("Entry#addEntry(): this.groupRepository.findById() can't find group", depositEntryDto.getGroupId());
-            throw ApplicationError.Conflict(depositEntryDto.getGroupId() + " non-existent group");
-        }
-
         // Add entry
         EntriesEntity entriesEntity = new EntriesEntity();
         entriesEntity.setUserId(depositEntryDto.getUserId());
+        entriesEntity.setEntryType(EntryType.valueOf(depositEntryDto.getEntryType().toString()));
         entriesEntity.setAmount(depositEntryDto.getAmount());
         entriesEntity.setNotes(depositEntryDto.getNote());
 
@@ -85,13 +74,14 @@ public class Entry implements IEntryService {
 
         entriesEntity.setPhotoEvidence(photoEvidence.getResult());
 
-        CallResult<EntriesEntity> depositoryAmount = CallWrapper.syncCall(() -> this.entryRepository.save(entriesEntity));
-        if (depositoryAmount.isFailure()) {
-            logger.error("Entry#addEntry(): this.entryRepository.save() failed", depositoryAmount.getError());
-            throw ApplicationError.InternalError(depositoryAmount.getError());
+        CallResult<EntriesEntity> amount = CallWrapper.syncCall(() -> this.entryRepository.save(entriesEntity));
+        if (amount.isFailure()) {
+            logger.error("Entry#addEntry(): this.entryRepository.save() failed", amount.getError());
+            throw ApplicationError.InternalError(amount.getError());
         }
+        System.out.println("Entries Entity: " + amount.getResult().getEntryType());
 
-        UUID entryId = depositoryAmount.getResult().getId();
+        UUID entryId = amount.getResult().getId();
 
         // Add UserEntries
         UserEntriesEntity entry = new UserEntriesEntity();
@@ -100,7 +90,7 @@ public class Entry implements IEntryService {
         entry.setGroupId(depositEntryDto.getGroupId());
 
         CallResult<UserEntriesEntity> userEntries = CallWrapper.syncCall(() -> this.userEntriesRepository.save(entry));
-        if (depositoryAmount.isFailure()) {
+        if (amount.isFailure()) {
             logger.error("Entry#addEntry(): this.userEntriesRepository.save() failed", userEntries.getError());
             throw ApplicationError.InternalError(userEntries.getError());
         }

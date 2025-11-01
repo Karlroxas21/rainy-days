@@ -1,6 +1,6 @@
 package com.rainydaysengine.rainydays.infra.postgres;
 
-import com.rainydaysengine.rainydays.infra.postgres.entity.EntriesEntity;
+import com.rainydaysengine.rainydays.infra.postgres.entity.entries.EntriesEntity;
 import com.rainydaysengine.rainydays.infra.postgres.repository.EntryRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
