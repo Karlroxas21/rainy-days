@@ -4,5 +4,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 public interface IEntryPort {
-    void uploadFile(String objectName, MultipartFile file, String contentType) throws Exception;
+    String putObject(String objectName, MultipartFile file, String contentType) throws Exception;
+    void removeObject(String bucketName, String objectName) throws Exception;
 }
