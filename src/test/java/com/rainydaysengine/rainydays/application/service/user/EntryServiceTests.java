@@ -3,7 +3,7 @@ package com.rainydaysengine.rainydays.application.service.user;
 import com.rainydaysengine.rainydays.application.port.entry.IEntryPort;
 import com.rainydaysengine.rainydays.application.service.entry.DepositEntryDto;
 import com.rainydaysengine.rainydays.application.service.entry.Entry;
-import com.rainydaysengine.rainydays.infra.postgres.entity.EntriesEntity;
+import com.rainydaysengine.rainydays.infra.postgres.entity.entries.EntriesEntity;
 import com.rainydaysengine.rainydays.infra.postgres.entity.GroupEntity;
 import com.rainydaysengine.rainydays.infra.postgres.entity.UserEntriesEntity;
 import com.rainydaysengine.rainydays.infra.postgres.entity.UsersEntity;
@@ -108,7 +108,7 @@ public class EntryServiceTests {
         String contentType = this.mockFile.getContentType();
 
 
-        doNothing().when(this.iEntryPort).uploadFile(objectName, this.mockFile, contentType);
+        doNothing().when(this.iEntryPort).putObject(objectName, this.mockFile, contentType);
 
         EntriesEntity entriesEntity = EntriesEntity
                 .builder()

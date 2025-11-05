@@ -35,6 +35,6 @@ public class MinioTests {
         String objectName = "app/entries/" + renamedFile;
         String contentType = this.mockFile.getContentType();
 
-        assertAll(() -> this.iEntryPort.uploadFile(objectName, this.mockFile, contentType));
+        assertAll(() -> this.iEntryPort.putObject(objectName, this.mockFile, contentType));
     }
 }

@@ -7,6 +7,8 @@ public class CallWrapper {
     public static <T> CallResult<T> syncCall(ThrowingSupplier<T> func) {
         try {
             return CallResult.success(func.get());
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Throwable error) {
             return CallResult.failure(error);
         }

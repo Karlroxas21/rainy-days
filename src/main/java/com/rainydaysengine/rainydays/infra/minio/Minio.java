@@ -31,7 +31,7 @@ public class Minio implements IEntryPort {
      * @throws Exception or Void
      */
     @Override
-    public void uploadFile(String objectName, MultipartFile file, String contentType) throws Exception {
+    public String putObject(String objectName, MultipartFile file, String contentType) throws Exception {
         boolean found = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
         if (!found) {
             minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
@@ -51,10 +51,26 @@ public class Minio implements IEntryPort {
                 )
         );
         if (upload.isFailure()) {
-            logger.error("Minio#uploadFile(): minioClient.uploadObject() failed", upload.getError());
+            logger.error("Minio#putObject(): minioClient.putObject() failed", upload.getError());
             throw ApplicationError.InternalError(upload.getError());
         }
 
-        logger.info("Minio#uploadFile(): minioClient.uploadObject() success. Object name: " + objectName);
+        logger.info("Minio#putObject(): minioClient.putObject() success. Object name: " + objectName);
+
+        return upload.getResult().object();
+    }
+
+    public void removeObject(String bucketName, String objectName) throws Exception {
+        try {
+            minioClient.removeObject(RemoveObjectArgs.builder()
+                    .bucket(bucketName)
+                    .object(objectName)
+                    .build());
+        }catch(Exception err) {
+            logger.error("Minio#removeObject(): minioClient.removeObject() failed", err);
+            throw ApplicationError.InternalError(err);
+        }
+        logger.info("Minio#removeObject(): minioClient.removeObject() success. Object name: " + objectName);
+
     }
 }

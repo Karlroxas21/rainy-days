@@ -6,10 +6,11 @@ import com.rainydaysengine.rainydays.application.service.entry.groupstatistics.G
 import com.rainydaysengine.rainydays.application.service.entry.groupstatistics.GroupStatisticResponse;
 import com.rainydaysengine.rainydays.application.service.entry.groupstatistics.MemberRanking;
 import com.rainydaysengine.rainydays.errors.ApplicationError;
-import com.rainydaysengine.rainydays.infra.postgres.entity.EntriesEntity;
 import com.rainydaysengine.rainydays.infra.postgres.entity.GroupEntity;
+import com.rainydaysengine.rainydays.infra.postgres.entity.entries.EntriesEntity;
 import com.rainydaysengine.rainydays.infra.postgres.entity.UserEntriesEntity;
 import com.rainydaysengine.rainydays.infra.postgres.entity.UsersEntity;
+import com.rainydaysengine.rainydays.infra.postgres.entity.entries.EntryType;
 import com.rainydaysengine.rainydays.infra.postgres.repository.EntryRepository;
 import com.rainydaysengine.rainydays.infra.postgres.repository.GroupRepository;
 import com.rainydaysengine.rainydays.infra.postgres.repository.UserEntriesRepository;
@@ -21,9 +22,12 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -40,6 +44,9 @@ public class Entry implements IEntryService {
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
     private final IEntryPort minio;
+
+    @Value("${minio.bucket}")
+    private String bucket;
 
     /**
      * @param depositEntryDto
@@ -62,21 +69,10 @@ public class Entry implements IEntryService {
 
         String fullName = user.getResult().get().getFirstName().toLowerCase() + "_" + user.getResult().get().getLastName().toLowerCase();
 
-        // Verify if Group Exists
-        CallResult<Optional<GroupEntity>> existingGroup = CallWrapper.syncCall(() -> this.groupRepository.findById(depositEntryDto.getGroupId()));
-        if (existingGroup.isFailure()) {
-            logger.error("Entry#addEntry(): this.groupRepository.findById() failed", existingGroup.getError());
-            throw ApplicationError.InternalError(existingGroup.getError());
-        }
-
-        if (existingGroup.getResult().isEmpty()) {
-            logger.info("Entry#addEntry(): this.groupRepository.findById() can't find group", depositEntryDto.getGroupId());
-            throw ApplicationError.Conflict(depositEntryDto.getGroupId() + " non-existent group");
-        }
-
         // Add entry
         EntriesEntity entriesEntity = new EntriesEntity();
         entriesEntity.setUserId(depositEntryDto.getUserId());
+        entriesEntity.setEntryType(EntryType.valueOf(depositEntryDto.getEntryType().toString()));
         entriesEntity.setAmount(depositEntryDto.getAmount());
         entriesEntity.setNotes(depositEntryDto.getNote());
 
@@ -89,13 +85,14 @@ public class Entry implements IEntryService {
 
         entriesEntity.setPhotoEvidence(photoEvidence.getResult());
 
-        CallResult<EntriesEntity> depositoryAmount = CallWrapper.syncCall(() -> this.entryRepository.save(entriesEntity));
-        if (depositoryAmount.isFailure()) {
-            logger.error("Entry#addEntry(): this.entryRepository.save() failed", depositoryAmount.getError());
-            throw ApplicationError.InternalError(depositoryAmount.getError());
+        CallResult<EntriesEntity> amount = CallWrapper.syncCall(() -> this.entryRepository.save(entriesEntity));
+        if (amount.isFailure()) {
+            logger.error("Entry#addEntry(): this.entryRepository.save() failed", amount.getError());
+            throw ApplicationError.InternalError(amount.getError());
         }
+        System.out.println("Entries Entity: " + amount.getResult().getEntryType());
 
-        UUID entryId = depositoryAmount.getResult().getId();
+        UUID entryId = amount.getResult().getId();
 
         // Add UserEntries
         UserEntriesEntity entry = new UserEntriesEntity();
@@ -104,10 +101,29 @@ public class Entry implements IEntryService {
         entry.setGroupId(depositEntryDto.getGroupId());
 
         CallResult<UserEntriesEntity> userEntries = CallWrapper.syncCall(() -> this.userEntriesRepository.save(entry));
-        if (depositoryAmount.isFailure()) {
+        if (amount.isFailure()) {
             logger.error("Entry#addEntry(): this.userEntriesRepository.save() failed", userEntries.getError());
             throw ApplicationError.InternalError(userEntries.getError());
         }
+
+        // Register cleanup if transaction rolls back
+        // Hook into the transaction lifecycle using Spring transaction sync callbacks.
+        // To test, delete all record first in entries and user_entries DB table then run this query:
+        // ALTER TABLE entries
+        // ALTER COLUMN entry_type TYPE varchar
+        // it should throw 'could not execute statement [ERROR: column \"entry_type\" is of type integer but expression is of type...'
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+            @Override
+            public void afterCompletion(int status) {
+                if (status == STATUS_ROLLED_BACK) {
+                    try {
+                        removeObject(photoEvidence.getResult());
+                    } catch (Exception e) {
+                        logger.error("Failed to clean up MinIO file after rollback", e);
+                    }
+                }
+            }
+        });
 
         return userEntries.getResult().getId().toString();
     }
@@ -250,8 +266,12 @@ public class Entry implements IEntryService {
         String objectName = "app/entries/" + renamedFile;
         String contentType = file.getContentType();
 
-        this.minio.uploadFile(objectName, file, contentType);
+        this.minio.putObject(objectName, file, contentType);
         return objectName;
     }
 
+
+    private void removeObject(String objectName) throws Exception{
+        this.minio.removeObject(bucket, objectName);
+    }
 }

@@ -1,4 +1,4 @@
-package com.rainydaysengine.rainydays.infra.postgres.entity;
+package com.rainydaysengine.rainydays.infra.postgres.entity.entries;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,6 +21,10 @@ public class EntriesEntity {
 
     @Column(name = "user_id")
     private UUID userId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "entry_type")
+    private EntryType entryType;
 
     @Column(name = "amount")
     private int amount;
