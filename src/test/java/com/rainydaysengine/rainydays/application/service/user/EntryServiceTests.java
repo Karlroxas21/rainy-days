@@ -108,7 +108,7 @@ public class EntryServiceTests {
         String contentType = this.mockFile.getContentType();
 
 
-        doNothing().when(this.iEntryPort).uploadFile(objectName, this.mockFile, contentType);
+        doNothing().when(this.iEntryPort).putObject(objectName, this.mockFile, contentType);
 
         EntriesEntity entriesEntity = EntriesEntity
                 .builder()
