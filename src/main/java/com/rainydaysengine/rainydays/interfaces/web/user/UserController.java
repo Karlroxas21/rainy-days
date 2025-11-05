@@ -2,10 +2,7 @@ package com.rainydaysengine.rainydays.interfaces.web.user;
 
 import com.rainydaysengine.rainydays.application.port.auth.Session;
 
-import com.rainydaysengine.rainydays.application.service.entry.DepositEntryDto;
-import com.rainydaysengine.rainydays.application.service.entry.Entry;
-import com.rainydaysengine.rainydays.application.service.entry.EntryResponse;
-import com.rainydaysengine.rainydays.application.service.entry.RecentEntriesResponse;
+import com.rainydaysengine.rainydays.application.service.entry.*;
 import com.rainydaysengine.rainydays.application.service.pagination.PaginationResponse;
 import com.rainydaysengine.rainydays.application.service.user.*;
 import jakarta.validation.Valid;
@@ -127,6 +124,25 @@ public class UserController {
                 userEntry.groupName()
         );
 
+        return ResponseEntity.ok(res);
+    }
+
+    @GetMapping(value = "/{userId}/group/{groupId}/total")
+    public ResponseEntity<TotalAmountContributedByUserResponse> getTotalAmountContributedByUser(
+            @PathVariable String userId,
+            @PathVariable String groupId) {
+        TotalAmountContributedByUserResponse total = entry.findTotalAmountContributedByUser(userId, groupId);
+
+        TotalAmountContributedByUserResponse res = new TotalAmountContributedByUserResponse(
+                total.groupName(),
+                total.combinedGoal(),
+                total.firstName(),
+                total.middleName(),
+                total.lastName(),
+                total.suffix(),
+                total.profileUrl(),
+                total.total()
+        );
         return ResponseEntity.ok(res);
     }
 
