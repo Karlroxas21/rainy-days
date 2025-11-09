@@ -3,7 +3,7 @@ package com.rainydaysengine.rainydays.interfaces.web.user;
 import com.rainydaysengine.rainydays.application.port.auth.Session;
 
 import com.rainydaysengine.rainydays.application.service.entry.*;
-import com.rainydaysengine.rainydays.application.service.pagination.PaginationResponse;
+import com.rainydaysengine.rainydays.application.service.common.PaginationResponse;
 import com.rainydaysengine.rainydays.application.service.user.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ public class UserController {
     private final User user;
     private final Entry entry;
 
-    private static final int DEFAULT_PAGE_SIZE = 5;
+    public static final int DEFAULT_PAGE_SIZE = 5;
 
     @PostMapping("/register")
     public CompletableFuture<ResponseEntity<UserRegisterResponse>> registerUser(

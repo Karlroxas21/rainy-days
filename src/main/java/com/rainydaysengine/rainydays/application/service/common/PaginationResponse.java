@@ -1,4 +1,4 @@
-package com.rainydaysengine.rainydays.application.service.pagination;
+package com.rainydaysengine.rainydays.application.service.common;
 
 import java.util.List;
 

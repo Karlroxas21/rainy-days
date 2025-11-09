@@ -5,6 +5,8 @@ import com.rainydaysengine.rainydays.application.service.entry.RecentEntriesResp
 import com.rainydaysengine.rainydays.application.service.entry.TotalAmountContributedByUserResponse;
 import com.rainydaysengine.rainydays.application.service.entry.groupstatistics.GroupProgress;
 import com.rainydaysengine.rainydays.application.service.entry.groupstatistics.MemberRanking;
+import com.rainydaysengine.rainydays.application.service.entry.history.AllRecentEntriesInGroup;
+import com.rainydaysengine.rainydays.application.service.entry.history.EntriesSummaryHistory;
 import com.rainydaysengine.rainydays.infra.postgres.entity.UserEntriesEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.NativeQuery;
@@ -12,6 +14,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +26,7 @@ public interface UserEntriesRepository extends JpaRepository<UserEntriesEntity, 
     @Query("""
             SELECT
                 e.id,
+                e.entryType,
                 e.amount,
                 e.notes,
                 e.photoEvidence,
@@ -141,7 +145,7 @@ public interface UserEntriesRepository extends JpaRepository<UserEntriesEntity, 
            """)
     Optional<GroupProgress> getGroupProgress(@Param("groupId") UUID groupId);
 
-//    Group Total in current month
+    // Group Total in current month
     @NativeQuery("""
             SELECT
                 g.group_name,
@@ -167,7 +171,7 @@ public interface UserEntriesRepository extends JpaRepository<UserEntriesEntity, 
             """)
     Optional<GroupProgress> getGroupTotalInCurrentMonth(@Param("groupId") UUID groupId);
 
-//    This month most_active or member_rankings(just get the first index)
+    // This month most_active or member_rankings(just get the first index)
     @NativeQuery("""
             SELECT
                 ue.user_id,
@@ -182,4 +186,51 @@ public interface UserEntriesRepository extends JpaRepository<UserEntriesEntity, 
                 ue.user_id
             """)
     List<MemberRanking> getMemberRankingInCurrentMonth(@Param("groupId") UUID groupId);
+
+    @NativeQuery("""
+            SELECT
+                SUM(e.amount) as total,
+                e.entry_type
+            FROM
+                user_entries ue
+            JOIN
+                entries e on ue.entry_id = e.id
+            WHERE
+                group_id = :groupId
+            AND
+                e.entry_type = :entryType
+            GROUP BY
+                e.amount,
+                e.entry_type
+                
+            """)
+    Optional<EntriesSummaryHistory> getEntriesSummaryHistory(@Param("groupId") UUID groupId, @Param("entryType")String entryType);
+
+    @Query("""
+            SELECT
+                e.userId,
+                g.id as groupId,
+                e.amount,
+                e.entryType,
+                e.notes,
+                e.photoEvidence,
+                ue.createdAt
+            FROM
+                UserEntriesEntity ue
+            LEFT JOIN
+                GroupEntity g ON ue.groupId = g.id
+            LEFT JOIN
+                EntriesEntity e ON ue.entryId = e.id
+            WHERE
+                ue.groupId = :groupId
+            AND
+                (:month IS NULL OR EXTRACT(MONTH FROM ue.createdAt) = :month)
+            AND
+                (:year IS NULL OR EXTRACT(YEAR FROM ue.createdAt) = :year)
+            """)
+    Page<AllRecentEntriesInGroup>getAllEntriesInGroup(
+            @Param("groupId")UUID groupId,
+            @RequestParam("month") Integer month,
+            @RequestParam("year") Integer year,
+            Pageable pageable);
 }
