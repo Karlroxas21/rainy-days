@@ -3,10 +3,10 @@ package com.rainydaysengine.rainydays.application.service.user;
 import com.rainydaysengine.rainydays.application.port.entry.IEntryPort;
 import com.rainydaysengine.rainydays.application.service.entry.DepositEntryDto;
 import com.rainydaysengine.rainydays.application.service.entry.Entry;
-import com.rainydaysengine.rainydays.infra.postgres.entity.entries.EntriesEntity;
 import com.rainydaysengine.rainydays.infra.postgres.entity.GroupEntity;
 import com.rainydaysengine.rainydays.infra.postgres.entity.UserEntriesEntity;
 import com.rainydaysengine.rainydays.infra.postgres.entity.UsersEntity;
+import com.rainydaysengine.rainydays.infra.postgres.entity.entries.EntriesEntity;
 import com.rainydaysengine.rainydays.infra.postgres.repository.EntryRepository;
 import com.rainydaysengine.rainydays.infra.postgres.repository.GroupRepository;
 import com.rainydaysengine.rainydays.infra.postgres.repository.UserEntriesRepository;
@@ -23,11 +23,11 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
-
 import java.util.Optional;
 import java.util.UUID;
+
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class EntryServiceTests {

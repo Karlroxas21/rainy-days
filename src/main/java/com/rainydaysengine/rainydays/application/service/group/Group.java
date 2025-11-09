@@ -55,7 +55,7 @@ public class Group implements IGroupService {
     }
 
     @Override
-    public void addUserToGroup(UUID userId, UUID groupId){
+    public void addUserToGroup(UUID userId, UUID groupId) {
         UsersGroupId id = new UsersGroupId(userId, groupId);
 
         // Check if User is already added to a group

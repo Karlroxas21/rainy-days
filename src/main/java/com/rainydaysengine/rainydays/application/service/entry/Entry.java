@@ -5,11 +5,14 @@ import com.rainydaysengine.rainydays.application.port.entry.IEntryService;
 import com.rainydaysengine.rainydays.application.service.entry.groupstatistics.GroupProgress;
 import com.rainydaysengine.rainydays.application.service.entry.groupstatistics.GroupStatisticResponse;
 import com.rainydaysengine.rainydays.application.service.entry.groupstatistics.MemberRanking;
+import com.rainydaysengine.rainydays.application.service.entry.history.AllRecentEntriesInGroup;
+import com.rainydaysengine.rainydays.application.service.entry.history.EntriesSummaryHistory;
+import com.rainydaysengine.rainydays.application.service.entry.history.GroupCompleteHistory;
 import com.rainydaysengine.rainydays.errors.ApplicationError;
 import com.rainydaysengine.rainydays.infra.postgres.entity.GroupEntity;
-import com.rainydaysengine.rainydays.infra.postgres.entity.entries.EntriesEntity;
 import com.rainydaysengine.rainydays.infra.postgres.entity.UserEntriesEntity;
 import com.rainydaysengine.rainydays.infra.postgres.entity.UsersEntity;
+import com.rainydaysengine.rainydays.infra.postgres.entity.entries.EntriesEntity;
 import com.rainydaysengine.rainydays.infra.postgres.entity.entries.EntryType;
 import com.rainydaysengine.rainydays.infra.postgres.repository.EntryRepository;
 import com.rainydaysengine.rainydays.infra.postgres.repository.GroupRepository;
@@ -30,6 +33,7 @@ import org.springframework.transaction.support.TransactionSynchronizationAdapter
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -147,8 +151,8 @@ public class Entry implements IEntryService {
 
     /**
      * @param entryId
-     * @Param userId
      * @return EntryResponse
+     * @Param userId
      */
     @Override
     public EntryResponse findEntry(String entryId, String userId) {
@@ -210,9 +214,9 @@ public class Entry implements IEntryService {
      * @return GroupStatisticResponse
      */
     @Override
-    public GroupStatisticResponse getGroupStatistics(UUID groupId) {
+    public GroupStatisticResponse getGroupStatistics(String groupId) {
         // Check if group is valid
-        CallResult<Optional<GroupEntity>> isValidGroup = CallWrapper.syncCall(() -> this.groupRepository.findById(groupId));
+        CallResult<Optional<GroupEntity>> isValidGroup = CallWrapper.syncCall(() -> this.groupRepository.findById(UUID.fromString(groupId)));
         if (isValidGroup.getResult().isEmpty()) {
             logger.error("Entry#getGroupStatistics(): this.groupRepository.findById() no entry found", groupId);
             throw ApplicationError.NotFound(groupId);
@@ -224,7 +228,7 @@ public class Entry implements IEntryService {
 
         // get Group Progress
         CallResult<Optional<GroupProgress>> groupProgress =
-                CallWrapper.syncCall(() -> this.userEntriesRepository.getGroupProgress(groupId));
+                CallWrapper.syncCall(() -> this.userEntriesRepository.getGroupProgress(UUID.fromString(groupId)));
         if (groupProgress.getResult().isEmpty()) {
             logger.info("No group progress found in {} group\", groupId");
         }
@@ -235,7 +239,7 @@ public class Entry implements IEntryService {
 
         // Get Group Progress in Current Month
         CallResult<Optional<GroupProgress>> getGroupTotalInCurrentMonth =
-                CallWrapper.syncCall(() -> this.userEntriesRepository.getGroupTotalInCurrentMonth(groupId));
+                CallWrapper.syncCall(() -> this.userEntriesRepository.getGroupTotalInCurrentMonth(UUID.fromString(groupId)));
         if (getGroupTotalInCurrentMonth.getResult().isEmpty()) {
             logger.info("No group progress in current month found in {} group\", groupId");
         }
@@ -246,7 +250,7 @@ public class Entry implements IEntryService {
 
         // Get Member Ranking
         CallResult<List<MemberRanking>> getMemberRankingInCurrentMonth =
-                CallWrapper.syncCall(() -> this.userEntriesRepository.getMemberRankingInCurrentMonth(groupId));
+                CallWrapper.syncCall(() -> this.userEntriesRepository.getMemberRankingInCurrentMonth(UUID.fromString(groupId)));
         if (getMemberRankingInCurrentMonth.isFailure()) {
             logger.error("Entry#getGroupStatistics(): this.userEntriesRepository.getMemberRankingInCurrentMonth()", getMemberRankingInCurrentMonth.getError());
             throw ApplicationError.InternalError(getMemberRankingInCurrentMonth.getError());
@@ -261,6 +265,68 @@ public class Entry implements IEntryService {
         return res;
     }
 
+    /**
+     * @param groupId, month (0-12), year(YYYY), pageable
+     * @return
+     */
+    @Override
+    public GroupCompleteHistory getCompleteGroupHistory(String groupId, Integer month, Integer year, Pageable pageable) {
+        System.out.println("Entry Service: " + groupId);
+        // Check if groupId is existing group
+        CallResult<Optional<GroupEntity>> isValidGroup = CallWrapper.syncCall(() -> this.groupRepository.findById(UUID.fromString(groupId)));
+        if (isValidGroup.getResult().isEmpty()) {
+            logger.error("Entry#getCompleteGroupHistory(): this.groupRepository.findById() no entry found", groupId);
+            throw ApplicationError.NotFound(groupId);
+        }
+        if (isValidGroup.isFailure()) {
+            logger.error("Entry#getCompleteGroupHistory(): this.groupRepository.findById() failed", isValidGroup.getError());
+            throw ApplicationError.InternalError(isValidGroup.getError());
+        }
+
+        // Get deposits history in group
+        CallResult<Optional<EntriesSummaryHistory>> depositSummary = CallWrapper.syncCall(
+                () -> this.userEntriesRepository.getEntriesSummaryHistory(UUID.fromString(groupId), EntryType.DEPOSIT.toString()));
+        if (depositSummary.isFailure()) {
+            logger.error("Entry#getCompleteGroupHistory(): this.userEntriesRepository.getEntriesSummaryHistory() failed", depositSummary.getError());
+            throw ApplicationError.InternalError(depositSummary.getError());
+        }
+
+        // Get withdraws history in group
+        CallResult<Optional<EntriesSummaryHistory>> withdrawSummary = CallWrapper.syncCall(
+                () -> this.userEntriesRepository.getEntriesSummaryHistory(UUID.fromString(groupId), EntryType.WITHDRAW.toString()));
+        if (withdrawSummary.isFailure()) {
+            logger.error("Entry#getCompleteGroupHistory(): this.userEntriesRepository.getEntriesSummaryHistory() failed", withdrawSummary.getError());
+            throw ApplicationError.InternalError(withdrawSummary.getError());
+        }
+
+        // Calculate get deposits - get withdraws
+        BigDecimal totalDeposits = depositSummary.getResult().get().total();
+        BigDecimal totalWithdraws = withdrawSummary.getResult().get().total();
+
+        BigDecimal netChange = totalDeposits.subtract(totalWithdraws);
+
+        // Get All entries in group
+        CallResult<Page<AllRecentEntriesInGroup>> allRecentEntriesInGroup = CallWrapper.syncCall(
+                () -> this.userEntriesRepository.getAllEntriesInGroup(
+                        UUID.fromString(groupId),
+                        month,
+                        year,
+                        pageable));
+        if (allRecentEntriesInGroup.isFailure()) {
+            logger.error("Entry#getCompleteGroupHistory(): this.userEntriesRepository.getAllEntriesInGroup() failed", allRecentEntriesInGroup.getError());
+            throw ApplicationError.InternalError(allRecentEntriesInGroup.getError());
+        }
+
+        GroupCompleteHistory groupCompleteHistory = new GroupCompleteHistory(
+                depositSummary.getResult().get(),
+                withdrawSummary.getResult().get(),
+                netChange,
+                allRecentEntriesInGroup.getResult()
+        );
+
+        return groupCompleteHistory;
+    }
+
     private String uploadFile(MultipartFile file, String user) throws Exception {
         String renamedFile = RenameFile.rename(file, "karl");
         String objectName = "app/entries/" + renamedFile;
@@ -270,8 +336,7 @@ public class Entry implements IEntryService {
         return objectName;
     }
 
-
-    private void removeObject(String objectName) throws Exception{
+    private void removeObject(String objectName) throws Exception {
         this.minio.removeObject(bucket, objectName);
     }
 }

@@ -66,7 +66,7 @@ public class Minio implements IEntryPort {
                     .bucket(bucketName)
                     .object(objectName)
                     .build());
-        }catch(Exception err) {
+        } catch (Exception err) {
             logger.error("Minio#removeObject(): minioClient.removeObject() failed", err);
             throw ApplicationError.InternalError(err);
         }
