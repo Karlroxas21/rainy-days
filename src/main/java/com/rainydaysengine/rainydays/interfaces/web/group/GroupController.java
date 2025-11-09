@@ -55,8 +55,8 @@ public class GroupController {
 
     /**
      * @param groupId
-     * @param month (0-12)
-     * @param year (YYYY)
+     * @param month    (0-12)
+     * @param year     (YYYY)
      * @param pageable
      * @return
      */
@@ -65,7 +65,7 @@ public class GroupController {
             @PathVariable String groupId,
             @RequestParam(required = false) Integer month,
             @RequestParam(required = false) Integer year,
-            @PageableDefault(page = 0, size =  DEFAULT_PAGE_SIZE, direction = Sort.Direction.DESC)
+            @PageableDefault(page = 0, size = DEFAULT_PAGE_SIZE, direction = Sort.Direction.DESC)
             Pageable pageable) {
 
         GroupCompleteHistory groupCompleteHistory = this.entry.getCompleteGroupHistory(groupId, month, year, pageable);

@@ -53,7 +53,7 @@ public class RedisConfig {
         }
 
         @Override
-        public ByteBuffer encodeKey(String key ) {
+        public ByteBuffer encodeKey(String key) {
             return StandardCharsets.UTF_8.encode(key);
         }
 

@@ -2,8 +2,9 @@ package com.rainydaysengine.rainydays.application.service.ipratelimit;
 
 import io.github.bucket4j.*;
 import io.github.bucket4j.distributed.proxy.ProxyManager;
-import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
 import java.time.Duration;
 
 @Service

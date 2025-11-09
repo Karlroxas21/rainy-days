@@ -1,9 +1,8 @@
 package com.rainydaysengine.rainydays.interfaces.web.user;
 
 import com.rainydaysengine.rainydays.application.port.auth.Session;
-
-import com.rainydaysengine.rainydays.application.service.entry.*;
 import com.rainydaysengine.rainydays.application.service.common.PaginationResponse;
+import com.rainydaysengine.rainydays.application.service.entry.*;
 import com.rainydaysengine.rainydays.application.service.user.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,12 +23,10 @@ import java.util.concurrent.CompletableFuture;
 @RestController
 @RequestMapping("/v1/user")
 public class UserController {
+    public static final int DEFAULT_PAGE_SIZE = 5;
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
-
     private final User user;
     private final Entry entry;
-
-    public static final int DEFAULT_PAGE_SIZE = 5;
 
     @PostMapping("/register")
     public CompletableFuture<ResponseEntity<UserRegisterResponse>> registerUser(
@@ -85,7 +82,7 @@ public class UserController {
     public ResponseEntity<PaginationResponse<RecentEntriesResponse>> getRecentEntriesByUserId(
             @PathVariable String userId,
             @RequestParam(required = false) String search,
-            @PageableDefault(page = 0, size =  DEFAULT_PAGE_SIZE, direction = Sort.Direction.DESC)
+            @PageableDefault(page = 0, size = DEFAULT_PAGE_SIZE, direction = Sort.Direction.DESC)
             Pageable pageable
     ) {
         String searchValue = (search == null || search.isBlank()) ? "" : search;

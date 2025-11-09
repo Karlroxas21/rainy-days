@@ -10,9 +10,9 @@ import com.rainydaysengine.rainydays.application.service.entry.history.EntriesSu
 import com.rainydaysengine.rainydays.application.service.entry.history.GroupCompleteHistory;
 import com.rainydaysengine.rainydays.errors.ApplicationError;
 import com.rainydaysengine.rainydays.infra.postgres.entity.GroupEntity;
-import com.rainydaysengine.rainydays.infra.postgres.entity.entries.EntriesEntity;
 import com.rainydaysengine.rainydays.infra.postgres.entity.UserEntriesEntity;
 import com.rainydaysengine.rainydays.infra.postgres.entity.UsersEntity;
+import com.rainydaysengine.rainydays.infra.postgres.entity.entries.EntriesEntity;
 import com.rainydaysengine.rainydays.infra.postgres.entity.entries.EntryType;
 import com.rainydaysengine.rainydays.infra.postgres.repository.EntryRepository;
 import com.rainydaysengine.rainydays.infra.postgres.repository.GroupRepository;
@@ -151,8 +151,8 @@ public class Entry implements IEntryService {
 
     /**
      * @param entryId
-     * @Param userId
      * @return EntryResponse
+     * @Param userId
      */
     @Override
     public EntryResponse findEntry(String entryId, String userId) {
@@ -336,7 +336,7 @@ public class Entry implements IEntryService {
         return objectName;
     }
 
-    private void removeObject(String objectName) throws Exception{
+    private void removeObject(String objectName) throws Exception {
         this.minio.removeObject(bucket, objectName);
     }
 }
