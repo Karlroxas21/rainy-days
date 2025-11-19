@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS users (
 	id UUID PRIMARY KEY,
-	iam_id VARCHAR(255) NOT NULL,
+	password VARCHAR(255) NOT NULL,
 	email_address VARCHAR(255) NOT NULL,
 	username VARCHAR(255),
 	first_name VARCHAR(255) NOT NULL,
@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS entries (
     id UUID PRIMARY KEY,
     user_id UUID NOT NULL,
     amount BIGINT NOT NULL,
+    entry_Type VARCHAR(255) NOT NULL,
     notes VARCHAR(255),
     photo_evidence VARCHAR(255),
     created_at TIMESTAMPTZ DEFAULT NOW(),

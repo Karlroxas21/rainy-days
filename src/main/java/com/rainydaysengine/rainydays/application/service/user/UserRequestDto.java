@@ -16,23 +16,25 @@ public class UserRequestDto {
 
     @NotBlank(message = "Email cannot be empty")
     @Email(message = "Please provide a valid email address")
-    private String email;
+    private String emailAddress;
 
     @NotBlank(message = "Username cannot be empty")
     private String username;
 
     @NotBlank(message = "First Name cannot be empty")
     @Pattern(regexp = "^[a-zA-Z\\s]+$", message = "First name must contain only letters and spaces")
-    private String first_name;
+    private String firstName;
 
     @Pattern(regexp = "^[a-zA-Z\\s]+$", message = "First name must contain only letters and spaces")
-    private String middle_name;
+    private String middleName;
 
     @NotBlank(message = "Last Name cannot be empty")
     @Pattern(regexp = "^[a-zA-Z\\s]+$", message = "First name must contain only letters and spaces")
-    private String last_name;
+    private String lastName;
 
     private String suffix;
+
+    private String profileUrl;
 
     @NotBlank(message = "Password cannot be empty")
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$",
