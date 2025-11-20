@@ -2,10 +2,7 @@ package com.rainydaysengine.rainydays.interfaces.web.user;
 
 import com.rainydaysengine.rainydays.application.service.common.PaginationResponse;
 import com.rainydaysengine.rainydays.application.service.entry.*;
-import com.rainydaysengine.rainydays.application.service.user.User;
-import com.rainydaysengine.rainydays.application.service.user.UserLoginRequest;
-import com.rainydaysengine.rainydays.application.service.user.UserRegisterResponse;
-import com.rainydaysengine.rainydays.application.service.user.UserRequestDto;
+import com.rainydaysengine.rainydays.application.service.user.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -42,24 +39,24 @@ public class UserController {
 
         return ResponseEntity.ok(response);
     }
-//
-//    @PostMapping("/whoami")
+
+    //    @PostMapping("/whoami")
 //    public ResponseEntity<?> whoAmI(@RequestBody UserWhoAmIRequest userWhoAmIRequest) {
 //        Session session = user.whoAmI(userWhoAmIRequest.getSession_token());
 //
 //        return ResponseEntity.ok(session);
 //    }
 //
-//    @PostMapping("/reset-password")
-//    public ResponseEntity<Void> resetPassword(@RequestBody @Valid UserResetPasswordRequest userResetPasswordRequest) {
-//
-//        String email = userResetPasswordRequest.getIdentity();
-//        String password = userResetPasswordRequest.getPassword();
-//
-//        user.resetPassword(email, password);
-//
-//        return ResponseEntity.noContent().build();
-//    }
+    @PostMapping("/reset-password")
+    public ResponseEntity<Void> resetPassword(@RequestBody @Valid UserResetPasswordRequest userResetPasswordRequest) {
+
+        String email = userResetPasswordRequest.getIdentity();
+        String password = userResetPasswordRequest.getPassword();
+
+        user.resetPassword(email, password);
+
+        return ResponseEntity.noContent().build();
+    }
 
     @PostMapping(value = "/add-entry", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> addEntry(@ModelAttribute @Valid DepositEntryDto depositEntryDto) {

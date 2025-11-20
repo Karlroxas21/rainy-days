@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -72,6 +73,7 @@ public class User implements IUserService {
 
     }
 
+    @Override
     public String verify(UserLoginRequest loginRequest) {
         Authentication authentication = authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -80,71 +82,25 @@ public class User implements IUserService {
         if (authentication.isAuthenticated()) {
             return jwtService.generateToken(loginRequest.getIdentifier());
         }
-        return "";
         // Spring will automatically returns
         // "code": 500, "message": "Bad credentials",
+        return "";
     }
 
-//    @Override
-//    public UserLoginResponse userLogin(String identifier, String password) {
-//        CallResult<Session> session = CallWrapper.syncCall(() -> this.iUserPort.userLogin(identifier, password));
-//
-//        if (session.isFailure()) {
-//            logger.error("User#userLogin(): frontendApi.createNativeLoginFlow() failed", session.getError());
-//            throw ApplicationError.Unauthorized(null);
-//        }
-//
-//        Map<String, Object> traits = session.getResult().traits();
-//        String token = session.getResult().token();
-//        OffsetDateTime expiry = session.getResult().expiresAt();
-//
-//        UserLoginResponse userLoginResponse = new UserLoginResponse(
-//                traits,
-//                token,
-//                expiry
-//        );
-//
-//        return userLoginResponse;
-//    }
+    @Override
+    public void resetPassword(String identity, String password) {
+        Optional<String> userId = userRepository.findByEmailAddressString(identity);
 
-//    @Override
-//    public Session whoAmI(String token) {
-//        CallResult<Session> sessionFromToken = CallWrapper.syncCall(() -> this.iUserPort.getSessionFromToken(token));
-//
-//        if (sessionFromToken.isFailure()) {
-//            logger.error("User#whoAmI(): iUserPort.getSessionFromToken() failed", sessionFromToken.getError());
-//            throw ApplicationError.Unauthorized(null);
-//        }
-//
-//        Session session = new Session(
-//                sessionFromToken.getResult().id(),
-//                sessionFromToken.getResult().token(),
-//                sessionFromToken.getResult().expiresAt(),
-//                sessionFromToken.getResult().devices(),
-//                sessionFromToken.getResult().identity(),
-//                sessionFromToken.getResult().traits()
-//        );
-//
-//        return session;
-//    }
+        if (!userId.isPresent()) {
+            logger.info("User#resetPassword(): userRepository.findByEmail() no user found", identity);
+        }
 
-//    @Override
-//    public void resetPassword(String identity, String password) {
-//        Optional<String> user = userRepository.findByEmailAddress(identity);
-//
-//        if (!user.isPresent()) {
-//            logger.info("User#resetPassword(): userRepository.findByEmail() no user found", identity);
-//        }
-//
-//        String iamId;
-//
-//        if (user.isPresent()) {
-//            iamId = user.get();
-//
-//            this.iUserPort.resetPassword(iamId, password);
-//            logger.info("User#resetPassword(): iUserPort.resetPassword() Reset password Success", iamId);
-//        }
-//    }
+        if (userId.isPresent()) {
+            String newPassword = encoder.encode(password);
+            this.userRepository.updatePassword(UUID.fromString(userId.get()), newPassword);
+            logger.info("User#resetPassword(): iUserPort.resetPassword() Reset password Success {}", userId.get());
+        }
+    }
 
     @NotNull
     private static UsersEntity getUsersEntity(UserRequestDto userRequestDto, String password) {

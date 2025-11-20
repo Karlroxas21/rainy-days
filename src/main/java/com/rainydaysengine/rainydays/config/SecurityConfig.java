@@ -32,7 +32,7 @@ public class SecurityConfig {
 
         return http.csrf(customizer -> customizer.disable())
                 .authorizeHttpRequests(request ->
-                        request.requestMatchers("/v1/user/login", "/v1/user/register")
+                        request.requestMatchers("/v1/user/login", "/v1/user/register", "/v1/user/reset-password")
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated())
