@@ -20,8 +20,8 @@ public class UsersEntity {
     @GeneratedValue
     private UUID id;
 
-    @Column(name = "iam_id")
-    private String iamId;
+    @Column(name = "password")
+    private String password;
 
     @Column(name = "email_address")
     private String emailAddress;

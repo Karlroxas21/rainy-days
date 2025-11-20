@@ -1,10 +1,8 @@
 package com.rainydaysengine.rainydays.application.service.user;
 
-import com.rainydaysengine.rainydays.application.port.auth.Session;
-import com.rainydaysengine.rainydays.application.port.user.IUserPort;
 import com.rainydaysengine.rainydays.application.port.user.IUserService;
+import com.rainydaysengine.rainydays.application.service.jwt.Jwt;
 import com.rainydaysengine.rainydays.errors.ApplicationError;
-import com.rainydaysengine.rainydays.infra.kratos.Kratos;
 import com.rainydaysengine.rainydays.infra.postgres.entity.UsersEntity;
 import com.rainydaysengine.rainydays.infra.postgres.repository.UserRepository;
 import com.rainydaysengine.rainydays.utils.CallResult;
@@ -13,27 +11,36 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.OffsetDateTime;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
 public class User implements IUserService {
-    private static final Logger logger = LoggerFactory.getLogger(Kratos.class);
+    private static final Logger logger = LoggerFactory.getLogger(User.class);
 
-    private final IUserPort iUserPort;
     private final Validator validator;
     private final UserRepository userRepository;
+    private final Jwt jwtService;
+
+    @Autowired
+    AuthenticationManager authManager;
+
+    private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
     @Override
-    public CompletableFuture<UserRegisterResponse> userRegister(UserRequestDto userRequestDto) {
+    public UserRegisterResponse userRegister(UserRequestDto userRequestDto) {
         // Validator
         Set<ConstraintViolation<UserRequestDto>> violations = validator.validate(userRequestDto);
 
@@ -43,92 +50,69 @@ public class User implements IUserService {
             throw new ConstraintViolationException(violations);
         }
 
-        CompletableFuture<String> futureIamId = this.iUserPort.userRegister(userRequestDto);
+        String password = encoder.encode(userRequestDto.getPassword());
 
-        futureIamId
-                .thenApply(iamId -> {
-                    UsersEntity user = new UsersEntity();
-                    user.setIamId(iamId);
-                    user.setEmailAddress(userRequestDto.getEmail());
-                    user.setUsername(userRequestDto.getUsername());
-                    user.setFirstName(userRequestDto.getFirst_name());
-                    user.setMiddleName(userRequestDto.getMiddle_name());
-                    user.setLastName(userRequestDto.getLast_name());
-                    user.setSuffix(userRequestDto.getSuffix());
+        UsersEntity usersEntity = getUsersEntity(userRequestDto, password);
 
-                    return userRepository.save(user);
-                })
-                .thenAccept(savedUser -> logger.info("User#userRegister(): User saved successfully. ID: {}",
-                        savedUser.getId()));
+        CallResult<UsersEntity> saveUser = CallWrapper.syncCall(() -> userRepository.save(usersEntity));
+        if (saveUser.isFailure()) {
+            logger.error("User#userRegister(): Error saving user. User: {}", usersEntity.getEmailAddress());
+            throw ApplicationError.InternalError(usersEntity.getEmailAddress());
+        }
+        logger.info("User#userRegister(): User saved successfully. ID: {}", usersEntity.getId());
 
-        return futureIamId.thenApply(iamId -> new UserRegisterResponse(
-                iamId,
-                userRequestDto.getEmail(),
-                userRequestDto.getUsername(),
-                userRequestDto.getFirst_name(),
-                Optional.ofNullable(userRequestDto.getMiddle_name()),
-                userRequestDto.getLast_name()));
+        return new UserRegisterResponse(
+                saveUser.getResult().getEmailAddress(),
+                saveUser.getResult().getUsername(),
+                saveUser.getResult().getFirstName(),
+                Optional.ofNullable(saveUser.getResult().getMiddleName()),
+                saveUser.getResult().getLastName()
+        );
+
     }
 
     @Override
-    public UserLoginResponse userLogin(String identifier, String password) {
-        CallResult<Session> session = CallWrapper.syncCall(() -> this.iUserPort.userLogin(identifier, password));
-
-        if (session.isFailure()) {
-            logger.error("User#userLogin(): frontendApi.createNativeLoginFlow() failed", session.getError());
-            throw ApplicationError.Unauthorized(null);
+    public String verify(UserLoginRequest loginRequest) {
+        Authentication authentication = authManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.getIdentifier(),
+                        loginRequest.getPassword()));
+        if (authentication.isAuthenticated()) {
+            return jwtService.generateToken(loginRequest.getIdentifier());
         }
-
-        Map<String, Object> traits = session.getResult().traits();
-        String token = session.getResult().token();
-        OffsetDateTime expiry = session.getResult().expiresAt();
-
-        UserLoginResponse userLoginResponse = new UserLoginResponse(
-                traits,
-                token,
-                expiry
-        );
-
-        return userLoginResponse;
-    }
-
-    @Override
-    public Session whoAmI(String token) {
-        CallResult<Session> sessionFromToken = CallWrapper.syncCall(() -> this.iUserPort.getSessionFromToken(token));
-
-        if (sessionFromToken.isFailure()) {
-            logger.error("User#whoAmI(): iUserPort.getSessionFromToken() failed", sessionFromToken.getError());
-            throw ApplicationError.Unauthorized(null);
-        }
-
-        Session session = new Session(
-                sessionFromToken.getResult().id(),
-                sessionFromToken.getResult().token(),
-                sessionFromToken.getResult().expiresAt(),
-                sessionFromToken.getResult().devices(),
-                sessionFromToken.getResult().identity(),
-                sessionFromToken.getResult().traits()
-        );
-
-        return session;
+        // Spring will automatically returns
+        // "code": 500, "message": "Bad credentials",
+        return "";
     }
 
     @Override
     public void resetPassword(String identity, String password) {
-        Optional<String> user = userRepository.findByEmailAddress(identity);
+        Optional<String> userId = userRepository.findByEmailAddressString(identity);
 
-        if (!user.isPresent()) {
+        if (!userId.isPresent()) {
             logger.info("User#resetPassword(): userRepository.findByEmail() no user found", identity);
         }
 
-        String iamId;
-
-        if (user.isPresent()) {
-            iamId = user.get();
-
-            this.iUserPort.resetPassword(iamId, password);
-            logger.info("User#resetPassword(): iUserPort.resetPassword() Reset password Success", iamId);
+        if (userId.isPresent()) {
+            String newPassword = encoder.encode(password);
+            this.userRepository.updatePassword(UUID.fromString(userId.get()), newPassword);
+            logger.info("User#resetPassword(): iUserPort.resetPassword() Reset password Success {}", userId.get());
         }
     }
 
+    @NotNull
+    private static UsersEntity getUsersEntity(UserRequestDto userRequestDto, String password) {
+        UsersEntity usersEntity = new UsersEntity();
+
+        usersEntity.setPassword(password);
+        usersEntity.setEmailAddress(userRequestDto.getEmailAddress());
+        usersEntity.setUsername(userRequestDto.getUsername());
+        usersEntity.setFirstName(userRequestDto.getFirstName());
+        usersEntity.setMiddleName(userRequestDto.getMiddleName());
+        usersEntity.setLastName(userRequestDto.getLastName());
+        usersEntity.setSuffix(userRequestDto.getSuffix());
+        usersEntity.setProfileUrl(userRequestDto.getProfileUrl());
+
+        return usersEntity;
+    }
 }

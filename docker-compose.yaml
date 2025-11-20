@@ -4,30 +4,30 @@ networks:
 
 services:
 
-#  app:
-#    build: . # Build the Dockerfile in current directory
-#    container_name: rainydays-service
-#    profiles:
-#      - dev
-#    ports:
-#      - "8080:8080"
-#    depends_on:
-#      - postgres
-#      - redis
-#      - ory-kratos
-#      - minio
-#    environment:
-#      - POSTGRES_CONNECTION=jdbc:postgresql://postgres:5432/rainydays
-#      - KRATOS_PUBLIC_BASE_URL=http://kratos:4433
-#      - KRATOS_PRIVATE_BASE_URL=http://kratos:4434
-#      - MINIO_BUCKET=files
-#      - MINIO_ENDPOINT=http://minio:9000
-#      - MINIO_ACCES_KEY=KARLADMIN
-#      - MINIO_SECRET_KEY=KARLADMIN
-#      - REDIS_HOST=redis://redis:6379
-#      - MAX_REQUEST_PER_MINUTE=50
-#    networks:
-#      - rainydays
+  #  app:
+  #    build: . # Build the Dockerfile in current directory
+  #    container_name: rainydays-service
+  #    profiles:
+  #      - dev
+  #    ports:
+  #      - "8080:8080"
+  #    depends_on:
+  #      - postgres
+  #      - redis
+  #      - ory-kratos
+  #      - minio
+  #    environment:
+  #      - POSTGRES_CONNECTION=jdbc:postgresql://postgres:5432/rainydays
+  #      - KRATOS_PUBLIC_BASE_URL=http://kratos:4433
+  #      - KRATOS_PRIVATE_BASE_URL=http://kratos:4434
+  #      - MINIO_BUCKET=files
+  #      - MINIO_ENDPOINT=http://minio:9000
+  #      - MINIO_ACCES_KEY=KARLADMIN
+  #      - MINIO_SECRET_KEY=KARLADMIN
+  #      - REDIS_HOST=redis://redis:6379
+  #      - MAX_REQUEST_PER_MINUTE=50
+  #    networks:
+  #      - rainydays
 
   postgres:
     image: postgres:17-alpine
@@ -62,35 +62,35 @@ services:
     networks:
       - rainydays
 
-  ory-kratos:
-    platform: linux/amd64
-    image: oryd/kratos:v1.1.0
-    container_name: rainydays_kratos
-    profiles:
-      - dev
-    depends_on:
-      - ory-kratos-migrate
-    environment:
-      SERVE_PUBLIC_BASE_URL: http://localhost:4433/
-      SERVE_ADMIN_BASE_URL: http://localhost:4434/
-      SELFSERVICE_DEFAULT_BROWSER_RETURN_URL: http://localhost:3000
-      SELFSERVICE_FLOWS_REGISTRATION_UI_URL: http://localhost:3000/auth/create-account
-      COURIER_SMTP_CONNECTION_URI: smtps://foo:bar@my-mailserver:1234/?skip_ssl_verify=false #TODO: config mail server
-      DSN: postgres://dev:dev@postgres:5432/rainydays_ory_kratos?sslmode=disable
-      IDENTITY_SCHEMAS: '[{ "id": "user", "url": "file:///data/v1-ory-kratos-identity-schema.json" }]'
-      IDENTITY_DEFAULT_SCHEMA_ID: user
-    volumes:
-      - ./misc/v1-ory-kratos-identity-schema.json:/data/v1-ory-kratos-identity-schema.json
-      - ./kratos/config/kratos.yaml:/etc/config/kratos/kratos.yaml
-    command: serve --dev --config /etc/config/kratos/kratos.yaml
-    ports:
-      #      public url
-      - 4433:4433
-      #      private url
-      - 4434:4434
-    restart: on-failure
-    networks:
-      - rainydays
+  #  ory-kratos:
+  #    platform: linux/amd64
+  #    image: oryd/kratos:v1.1.0
+  #    container_name: rainydays_kratos
+  #    profiles:
+  #      - dev
+  #    depends_on:
+  #      - ory-kratos-migrate
+  #    environment:
+  #      SERVE_PUBLIC_BASE_URL: http://localhost:4433/
+  #      SERVE_ADMIN_BASE_URL: http://localhost:4434/
+  #      SELFSERVICE_DEFAULT_BROWSER_RETURN_URL: http://localhost:3000
+  #      SELFSERVICE_FLOWS_REGISTRATION_UI_URL: http://localhost:3000/auth/create-account
+  #      COURIER_SMTP_CONNECTION_URI: smtps://foo:bar@my-mailserver:1234/?skip_ssl_verify=false #TODO: config mail server
+  #      DSN: postgres://dev:dev@postgres:5432/rainydays_ory_kratos?sslmode=disable
+  #      IDENTITY_SCHEMAS: '[{ "id": "user", "url": "file:///data/v1-ory-kratos-identity-schema.json" }]'
+  #      IDENTITY_DEFAULT_SCHEMA_ID: user
+  #    volumes:
+  #      - ./misc/v1-ory-kratos-identity-schema.json:/data/v1-ory-kratos-identity-schema.json
+  #      - ./kratos/config/kratos.yaml:/etc/config/kratos/kratos.yaml
+  #    command: serve --dev --config /etc/config/kratos/kratos.yaml
+  #    ports:
+  #      #      public url
+  #      - 4433:4433
+  #      #      private url
+  #      - 4434:4434
+  #    restart: on-failure
+  #    networks:
+  #      - rainydays
 
   minio:
     image: minio/minio
@@ -113,14 +113,14 @@ services:
     container_name: rainydays-redis
     restart: always
     profiles:
-     - dev
+      - dev
     ports:
-     - 6379:6379
+      - 6379:6379
     command:
-     - redis-server
-     - --save
-     - '60'
-     - '1'
+      - redis-server
+      - --save
+      - '60'
+      - '1'
     volumes:
       - ./.data/redis:/data
     networks:

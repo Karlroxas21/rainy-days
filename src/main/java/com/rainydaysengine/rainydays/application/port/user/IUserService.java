@@ -1,18 +1,14 @@
 package com.rainydaysengine.rainydays.application.port.user;
 
-import com.rainydaysengine.rainydays.application.port.auth.Session;
-import com.rainydaysengine.rainydays.application.service.user.UserLoginResponse;
+import com.rainydaysengine.rainydays.application.service.user.UserLoginRequest;
 import com.rainydaysengine.rainydays.application.service.user.UserRegisterResponse;
 import com.rainydaysengine.rainydays.application.service.user.UserRequestDto;
 
-import java.util.concurrent.CompletableFuture;
-
 public interface IUserService {
-    CompletableFuture<UserRegisterResponse> userRegister(UserRequestDto userRequestDto);
+    UserRegisterResponse userRegister(UserRequestDto userRequestDto);
 
-    UserLoginResponse userLogin(String identifier, String password);
-
-    Session whoAmI(String token);
+    // Login
+    String verify(UserLoginRequest loginRequest);
 
     void resetPassword(String id, String password);
 }

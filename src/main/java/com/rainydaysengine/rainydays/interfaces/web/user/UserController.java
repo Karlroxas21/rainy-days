@@ -1,6 +1,5 @@
 package com.rainydaysengine.rainydays.interfaces.web.user;
 
-import com.rainydaysengine.rainydays.application.port.auth.Session;
 import com.rainydaysengine.rainydays.application.service.common.PaginationResponse;
 import com.rainydaysengine.rainydays.application.service.entry.*;
 import com.rainydaysengine.rainydays.application.service.user.*;
@@ -17,8 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.concurrent.CompletableFuture;
-
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/v1/user")
@@ -29,28 +26,27 @@ public class UserController {
     private final Entry entry;
 
     @PostMapping("/register")
-    public CompletableFuture<ResponseEntity<UserRegisterResponse>> registerUser(
-            @Valid @RequestBody UserRequestDto requestDto) {
+    public ResponseEntity<UserRegisterResponse> registerUser(@Valid @RequestBody UserRequestDto requestDto) {
+        UserRegisterResponse userRegisterResponse = user.userRegister(requestDto);
 
-        return user.userRegister(requestDto)
-                .thenApply(userRegisterResponse -> ResponseEntity.status(201).body(userRegisterResponse));
+        return ResponseEntity.ok(userRegisterResponse);
 
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserLoginResponse> login(@RequestBody @Valid UserLoginRequest loginRequest) {
-        UserLoginResponse response = user.userLogin(loginRequest.getIdentifier(), loginRequest.getPassword());
+    public ResponseEntity<String> login(@RequestBody @Valid UserLoginRequest loginRequest) {
+        String response = user.verify(loginRequest);
 
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/whoami")
-    public ResponseEntity<?> whoAmI(@RequestBody UserWhoAmIRequest userWhoAmIRequest) {
-        Session session = user.whoAmI(userWhoAmIRequest.getSession_token());
-
-        return ResponseEntity.ok(session);
-    }
-
+    //    @PostMapping("/whoami")
+//    public ResponseEntity<?> whoAmI(@RequestBody UserWhoAmIRequest userWhoAmIRequest) {
+//        Session session = user.whoAmI(userWhoAmIRequest.getSession_token());
+//
+//        return ResponseEntity.ok(session);
+//    }
+//
     @PostMapping("/reset-password")
     public ResponseEntity<Void> resetPassword(@RequestBody @Valid UserResetPasswordRequest userResetPasswordRequest) {
 
