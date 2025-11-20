@@ -2,7 +2,7 @@ package com.rainydaysengine.rainydays.infra.postgres.repository;
 
 import com.rainydaysengine.rainydays.infra.postgres.entity.UsersEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
-1import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;

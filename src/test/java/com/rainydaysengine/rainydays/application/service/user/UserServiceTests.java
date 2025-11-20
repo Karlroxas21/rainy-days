@@ -1,6 +1,5 @@
 package com.rainydaysengine.rainydays.application.service.user;
 
-import com.rainydaysengine.rainydays.application.port.user.IUserPort;
 import com.rainydaysengine.rainydays.infra.postgres.repository.UserRepository;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,9 +16,6 @@ public class UserServiceTests {
     // UserService_UserRegister_ReturnsUserRegisterResponse needs this
     @Mock
     private Validator validator;
-
-    @Mock
-    private IUserPort iUserPort;
 
     @InjectMocks
     private User userService;

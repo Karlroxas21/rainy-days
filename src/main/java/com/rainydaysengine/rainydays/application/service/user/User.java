@@ -1,6 +1,5 @@
 package com.rainydaysengine.rainydays.application.service.user;
 
-import com.rainydaysengine.rainydays.application.port.user.IUserPort;
 import com.rainydaysengine.rainydays.application.port.user.IUserService;
 import com.rainydaysengine.rainydays.application.service.jwt.Jwt;
 import com.rainydaysengine.rainydays.errors.ApplicationError;
@@ -31,7 +30,6 @@ import java.util.UUID;
 public class User implements IUserService {
     private static final Logger logger = LoggerFactory.getLogger(User.class);
 
-    private final IUserPort iUserPort;
     private final Validator validator;
     private final UserRepository userRepository;
     private final Jwt jwtService;
