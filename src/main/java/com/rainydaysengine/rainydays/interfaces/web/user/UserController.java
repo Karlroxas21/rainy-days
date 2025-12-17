@@ -34,10 +34,12 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody @Valid UserLoginRequest loginRequest) {
+    public ResponseEntity<UserLoginResponse> login(@RequestBody @Valid UserLoginRequest loginRequest) {
         String response = user.verify(loginRequest);
 
-        return ResponseEntity.ok(response);
+        UserLoginResponse userSession = new UserLoginResponse(response);
+        
+        return ResponseEntity.ok(userSession);
     }
 
     //    @PostMapping("/whoami")

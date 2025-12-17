@@ -31,8 +31,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         return http.csrf(customizer -> customizer.disable())
+                .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(request ->
-                        request.requestMatchers("/v1/user/login", "/v1/user/register", "/v1/user/reset-password")
+                        request.requestMatchers("/v1/user/login", "/v1/user/register", "/v1/user/reset-password", "/swagger-ui/index.html#/", "/v1/health")
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated())
