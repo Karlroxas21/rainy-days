@@ -1,11 +1,15 @@
 package com.rainydaysengine.rainydays.application.service.group;
 
 import com.rainydaysengine.rainydays.application.port.group.IGroupService;
+import com.rainydaysengine.rainydays.application.service.jwt.Jwt;
+import com.rainydaysengine.rainydays.application.service.usersgroup.UserGroupsResponse;
 import com.rainydaysengine.rainydays.errors.ApplicationError;
 import com.rainydaysengine.rainydays.infra.postgres.entity.GroupEntity;
+import com.rainydaysengine.rainydays.infra.postgres.entity.UsersEntity;
 import com.rainydaysengine.rainydays.infra.postgres.entity.usersgroup.UsersGroupEntity;
 import com.rainydaysengine.rainydays.infra.postgres.entity.usersgroup.UsersGroupId;
 import com.rainydaysengine.rainydays.infra.postgres.repository.GroupRepository;
+import com.rainydaysengine.rainydays.infra.postgres.repository.UserRepository;
 import com.rainydaysengine.rainydays.infra.postgres.repository.UsersGroupRepository;
 import com.rainydaysengine.rainydays.utils.CallResult;
 import com.rainydaysengine.rainydays.utils.CallWrapper;
@@ -14,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,13 +29,15 @@ public class Group implements IGroupService {
 
     private final GroupRepository groupRepository;
     private final UsersGroupRepository usersGroupRepository;
+    private final UserRepository userRepository;
+    private final Jwt jwtService;
 
     /**
      * @param groupDto
      * @return UUID of new group
      */
     @Override
-    public UUID createNewGroup(GroupDto groupDto) {
+    public UUID createNewGroup(GroupDto groupDto, String jwt) {
         GroupEntity groupEntity = new GroupEntity();
         groupEntity.setGroupName(groupDto.getGroupName());
         groupEntity.setCombinedGoal(groupDto.getCombinedGoal());
@@ -51,6 +58,25 @@ public class Group implements IGroupService {
             logger.error("Group#createNewGroup(): this.groupRepository.save() failed", savedGroupEntity.getError());
             throw ApplicationError.InternalError(savedGroupEntity.getError());
         }
+
+        String email = jwtService.extractUsername(jwt);
+
+        CallResult<UsersEntity> user = CallWrapper.syncCall(() -> this.userRepository.findByEmailAddress(email));
+        if (user.isFailure()) {
+            logger.error("Group#createNewGroup(): this.userRepository.findByEmailAddress() failed", user.getError());
+            throw ApplicationError.InternalError(user.getError());
+        }
+
+        UsersGroupEntity usersGroupEntity = new UsersGroupEntity();
+        usersGroupEntity.setUserId(user.getResult().getId());
+        usersGroupEntity.setGroupId(savedGroupEntity.getResult().getId());
+
+        CallResult<UsersGroupEntity> usersGroup = CallWrapper.syncCall(() -> this.usersGroupRepository.save(usersGroupEntity));
+        if (user.isFailure()) {
+            logger.error("Group#createNewGroup(): this.usersGroupRepository.save() failed", usersGroup.getError());
+            throw ApplicationError.InternalError(usersGroup.getError());
+        }
+
         return savedGroupEntity.getResult().getId();
     }
 
@@ -74,5 +100,29 @@ public class Group implements IGroupService {
             logger.error("Group#addUserToGroup(): this.usersGroupRepository.save() failed", savedUserToGroup.getError());
             throw ApplicationError.InternalError(savedUserToGroup.getError());
         }
+    }
+
+    /**
+     * @param jwt
+     * @return UserGroupsResponse
+     */
+    @Override
+    public List<UserGroupsResponse> getUserGroups(String jwt) {
+
+        String email = jwtService.extractUsername(jwt);
+
+        CallResult<UsersEntity> user = CallWrapper.syncCall(() -> this.userRepository.findByEmailAddress(email));
+        if (user.isFailure()) {
+            logger.error("Group#getUserGroups(): this.userRepository.findByEmailAddress() failed", user.getError());
+            throw ApplicationError.InternalError(user.getError());
+        }
+
+        CallResult<List<UserGroupsResponse>> userGroupsResponse = CallWrapper.syncCall(() -> this.usersGroupRepository.findAllUserGroups(user.getResult().getId()));
+        if (userGroupsResponse.isFailure()) {
+            logger.error("Group#getUserGroups(): this.usersGroupRepository.findAllUserGroups() failed", userGroupsResponse.getError());
+            throw ApplicationError.InternalError(userGroupsResponse.getError());
+        }
+
+        return userGroupsResponse.getResult();
     }
 }
