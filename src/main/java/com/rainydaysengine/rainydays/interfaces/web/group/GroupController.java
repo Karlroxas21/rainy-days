@@ -8,6 +8,7 @@ import com.rainydaysengine.rainydays.application.service.entry.history.GroupComp
 import com.rainydaysengine.rainydays.application.service.entry.history.GroupCompleteHistoryPaginationResponse;
 import com.rainydaysengine.rainydays.application.service.group.Group;
 import com.rainydaysengine.rainydays.application.service.group.GroupDto;
+import com.rainydaysengine.rainydays.application.service.usersgroup.UserGroupsResponse;
 import com.rainydaysengine.rainydays.interfaces.web.user.UserController;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 import static com.rainydaysengine.rainydays.interfaces.web.user.UserController.DEFAULT_PAGE_SIZE;
@@ -33,10 +35,29 @@ public class GroupController {
     private final Entry entry;
 
     @PostMapping("/create-group")
-    public ResponseEntity<UUID> createGroup(@RequestBody @Valid GroupDto groupDto) {
-        UUID newGroup = this.group.createNewGroup(groupDto);
+    public ResponseEntity<UUID> createGroup(@RequestBody @Valid GroupDto groupDto, @RequestHeader("Authorization") String bearerToken) {
+        String jwt = "";
+
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            jwt = bearerToken.substring(7); // Remove "Bearer " prefix.
+        }
+
+        UUID newGroup = this.group.createNewGroup(groupDto, jwt);
 
         return ResponseEntity.ok(newGroup);
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<List<UserGroupsResponse>> getUserGroups(@RequestHeader("Authorization") String bearerToken) {
+        String jwt = "";
+
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            jwt = bearerToken.substring(7); // Remove "Bearer " prefix.
+        }
+
+        List<UserGroupsResponse> userGroups = this.group.getUserGroups(jwt);
+
+        return ResponseEntity.ok(userGroups);
     }
 
     @PostMapping("/{groupId}/user/{userId}")

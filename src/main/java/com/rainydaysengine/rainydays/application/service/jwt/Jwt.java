@@ -49,7 +49,7 @@ public class Jwt {
         Instant nowInstant = Instant.now();
 
         // Duration
-        Duration duration = Duration.ofMinutes(60);
+        Duration duration = Duration.ofMinutes(21600); // 15 days
 
         // Expiration
         Instant expirationInstant = nowInstant.plus(duration);
