@@ -46,21 +46,21 @@ services:
     networks:
       - rainydays
 
-  ory-kratos-migrate:
-    image: oryd/kratos:v1.1.0
-    platform: linux/amd64
-    container_name: rainydays_kratos_migrate
-    profiles:
-      - dev
-    depends_on:
-      - postgres
-    command:
-      - migrate
-      - sql
-      - postgres://dev:dev@postgres:5432/rainydays_ory_kratos?sslmode=disable
-      - --yes
-    networks:
-      - rainydays
+#  ory-kratos-migrate:
+#    image: oryd/kratos:v1.1.0
+#    platform: linux/amd64
+#    container_name: rainydays_kratos_migrate
+#    profiles:
+#      - dev
+#    depends_on:
+#      - postgres
+#    command:
+#      - migrate
+#      - sql
+#      - postgres://dev:dev@postgres:5432/rainydays_ory_kratos?sslmode=disable
+#      - --yes
+#    networks:
+#      - rainydays
 
   #  ory-kratos:
   #    platform: linux/amd64

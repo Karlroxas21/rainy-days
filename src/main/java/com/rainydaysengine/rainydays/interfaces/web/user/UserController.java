@@ -42,13 +42,13 @@ public class UserController {
         return ResponseEntity.ok(userSession);
     }
 
-    //    @PostMapping("/whoami")
-//    public ResponseEntity<?> whoAmI(@RequestBody UserWhoAmIRequest userWhoAmIRequest) {
-//        Session session = user.whoAmI(userWhoAmIRequest.getSession_token());
-//
-//        return ResponseEntity.ok(session);
-//    }
-//
+    @GetMapping("/whoami")
+    public ResponseEntity<UserWhoAmIResponse> whoAmI(@RequestHeader String Authorization) {
+        UserWhoAmIResponse whoAmIResponse = this.user.whoAmI(Authorization);
+
+        return ResponseEntity.ok(whoAmIResponse);
+    }
+
     @PostMapping("/reset-password")
     public ResponseEntity<Void> resetPassword(@RequestBody @Valid UserResetPasswordRequest userResetPasswordRequest) {
 

@@ -100,6 +100,27 @@ public class User implements IUserService {
         }
     }
 
+    @Override
+    public UserWhoAmIResponse whoAmI(String sessionToken) {
+        String token = sessionToken.substring(7);
+        String identity = jwtService.extractUsername(token);
+
+        CallResult<UsersEntity> userEntity = CallWrapper.syncCall(() -> userRepository.findByEmailAddress(identity));
+        if (userEntity.isFailure()) {
+            logger.error("User#whoAmI(): Error getting data.", userEntity.getError());
+            throw ApplicationError.InternalError(userEntity.getError());
+        }
+
+        return new UserWhoAmIResponse(
+                userEntity.getResult().getId(),
+                userEntity.getResult().getEmailAddress(),
+                userEntity.getResult().getFirstName(),
+                Optional.ofNullable(userEntity.getResult().getMiddleName()),
+                userEntity.getResult().getLastName(),
+                userEntity.getResult().getProfileUrl()
+        );
+    }
+
     @NotNull
     private static UsersEntity getUsersEntity(UserRequestDto userRequestDto, String password) {
         UsersEntity usersEntity = new UsersEntity();

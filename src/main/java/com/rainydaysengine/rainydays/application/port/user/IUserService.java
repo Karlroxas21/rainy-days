@@ -3,6 +3,7 @@ package com.rainydaysengine.rainydays.application.port.user;
 import com.rainydaysengine.rainydays.application.service.user.UserLoginRequest;
 import com.rainydaysengine.rainydays.application.service.user.UserRegisterResponse;
 import com.rainydaysengine.rainydays.application.service.user.UserRequestDto;
+import com.rainydaysengine.rainydays.application.service.user.UserWhoAmIResponse;
 
 public interface IUserService {
     UserRegisterResponse userRegister(UserRequestDto userRequestDto);
@@ -11,4 +12,6 @@ public interface IUserService {
     String verify(UserLoginRequest loginRequest);
 
     void resetPassword(String id, String password);
+
+    UserWhoAmIResponse whoAmI(String sessionToken);
 }
