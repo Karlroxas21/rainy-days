@@ -1,14 +1,11 @@
 package com.rainydaysengine.rainydays.application.service.usersgroup;
 
-import lombok.Builder;
-
-import java.util.Optional;
 import java.util.UUID;
 
-@Builder
-public record UserGroupsResponse(
+public record UsersGroupWithTotalMembers(
         UUID id,
         String groupName,
-        int amount
+        int amount,
+        int totalMembers
 ) {
 }

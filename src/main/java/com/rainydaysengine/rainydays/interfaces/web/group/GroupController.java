@@ -9,6 +9,7 @@ import com.rainydaysengine.rainydays.application.service.entry.history.GroupComp
 import com.rainydaysengine.rainydays.application.service.group.Group;
 import com.rainydaysengine.rainydays.application.service.group.GroupDto;
 import com.rainydaysengine.rainydays.application.service.usersgroup.UserGroupsResponse;
+import com.rainydaysengine.rainydays.application.service.usersgroup.UsersGroupWithTotalMembers;
 import com.rainydaysengine.rainydays.interfaces.web.user.UserController;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -48,14 +49,14 @@ public class GroupController {
     }
 
     @GetMapping("/user")
-    public ResponseEntity<List<UserGroupsResponse>> getUserGroups(@RequestHeader("Authorization") String bearerToken) {
+    public ResponseEntity<List<UsersGroupWithTotalMembers>> getUserGroups(@RequestHeader("Authorization") String bearerToken) {
         String jwt = "";
 
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             jwt = bearerToken.substring(7); // Remove "Bearer " prefix.
         }
 
-        List<UserGroupsResponse> userGroups = this.group.getUserGroups(jwt);
+        List<UsersGroupWithTotalMembers> userGroups = this.group.getUserGroups(jwt);
 
         return ResponseEntity.ok(userGroups);
     }

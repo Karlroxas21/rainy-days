@@ -38,6 +38,7 @@ public class UserController {
         String response = user.verify(loginRequest);
 
         UserLoginResponse userSession = new UserLoginResponse(response);
+        System.out.println("USER SESH: " + userSession.tokenSession());
         
         return ResponseEntity.ok(userSession);
     }

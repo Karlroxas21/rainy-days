@@ -24,11 +24,11 @@ public class UserRequestDto {
     @Pattern(regexp = "^[a-zA-Z\\s]+$", message = "First name must contain only letters and spaces")
     private String firstName;
 
-    @Pattern(regexp = "^[a-zA-Z\\s]+$", message = "First name must contain only letters and spaces")
+    @Pattern(regexp = "^[a-zA-Z\\s]+$", message = "Middle name must contain only letters and spaces")
     private String middleName;
 
     @NotBlank(message = "Last Name cannot be empty")
-    @Pattern(regexp = "^[a-zA-Z\\s]+$", message = "First name must contain only letters and spaces")
+    @Pattern(regexp = "^[a-zA-Z\\s]+$", message = "Last name must contain only letters and spaces")
     private String lastName;
 
     private String suffix;

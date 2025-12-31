@@ -3,6 +3,7 @@ package com.rainydaysengine.rainydays.application.service.group;
 import com.rainydaysengine.rainydays.application.port.group.IGroupService;
 import com.rainydaysengine.rainydays.application.service.jwt.Jwt;
 import com.rainydaysengine.rainydays.application.service.usersgroup.UserGroupsResponse;
+import com.rainydaysengine.rainydays.application.service.usersgroup.UsersGroupWithTotalMembers;
 import com.rainydaysengine.rainydays.errors.ApplicationError;
 import com.rainydaysengine.rainydays.infra.postgres.entity.GroupEntity;
 import com.rainydaysengine.rainydays.infra.postgres.entity.UsersEntity;
@@ -18,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -107,7 +109,7 @@ public class Group implements IGroupService {
      * @return UserGroupsResponse
      */
     @Override
-    public List<UserGroupsResponse> getUserGroups(String jwt) {
+    public List<UsersGroupWithTotalMembers> getUserGroups(String jwt) {
 
         String email = jwtService.extractUsername(jwt);
 
@@ -123,6 +125,27 @@ public class Group implements IGroupService {
             throw ApplicationError.InternalError(userGroupsResponse.getError());
         }
 
-        return userGroupsResponse.getResult();
+        List<UsersGroupWithTotalMembers> userGroupsWithTotalMembers = new ArrayList<>();
+
+        for (UserGroupsResponse group : userGroupsResponse.getResult()) {
+            UUID groupId = group.id();
+
+            CallResult<Integer> totalMembers = CallWrapper.syncCall(() -> this.groupRepository.findTotalGroupMembers(groupId));
+            if (totalMembers.isFailure()) {
+                logger.error("Group#getUserGroups(): Failed to fetch total members for groupId " + groupId, totalMembers.getError());
+                throw ApplicationError.InternalError(totalMembers.getError());
+            }
+
+            UsersGroupWithTotalMembers updatedGroup = new UsersGroupWithTotalMembers(
+                    group.id(),
+                    group.groupName(),
+                    group.amount(),
+                    totalMembers.getResult()
+            );
+
+            userGroupsWithTotalMembers.add(updatedGroup);
+        }
+
+        return userGroupsWithTotalMembers;
     }
 }

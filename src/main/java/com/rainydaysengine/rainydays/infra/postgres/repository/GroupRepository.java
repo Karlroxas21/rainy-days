@@ -12,4 +12,7 @@ public interface GroupRepository extends JpaRepository<GroupEntity, UUID> {
 
     @Query("SELECT g.groupName FROM GroupEntity g WHERE g.groupName = :groupName")
     Optional<String> findByGroupName(@Param("groupName") String groupName);
+
+    @Query("SELECT COUNT(*) as totalMembers FROM UsersGroupEntity WHERE groupId = :groupId")
+    int findTotalGroupMembers(@Param("groupId") UUID groupId);
 }

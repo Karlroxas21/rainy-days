@@ -200,8 +200,7 @@ public interface UserEntriesRepository extends JpaRepository<UserEntriesEntity, 
             AND
                 e.entry_type = :entryType
             GROUP BY
-                e.amount,
-            
+                e.entry_type
             """)
     Optional<EntriesSummaryHistory> getEntriesSummaryHistory(@Param("groupId") UUID groupId, @Param("entryType") String entryType);
 

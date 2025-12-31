@@ -43,9 +43,9 @@ public class User implements IUserService {
     public UserRegisterResponse userRegister(UserRequestDto userRequestDto) {
         // Check if email already exists
         CallResult<UsersEntity> exist =  CallWrapper.syncCall(() -> userRepository.findByEmailAddress(userRequestDto.getEmailAddress()));
-        if(exist.getResult().getId() != null) {
+        if(exist.getResult() != null) {
             logger.error("User#exist: Email already exists. {}", exist.getResult().getEmailAddress());
-            throw ApplicationError.Conflict(exist.getResult().getEmailAddress()dd);
+            throw ApplicationError.Conflict(exist.getResult().getEmailAddress());
         }
 
         // Validator
@@ -124,6 +124,7 @@ public class User implements IUserService {
                 userEntity.getResult().getFirstName(),
                 Optional.ofNullable(userEntity.getResult().getMiddleName()),
                 userEntity.getResult().getLastName(),
+                Optional.ofNullable(userEntity.getResult().getSuffix()),
                 userEntity.getResult().getProfileUrl()
         );
     }
