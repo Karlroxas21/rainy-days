@@ -41,6 +41,13 @@ public class User implements IUserService {
 
     @Override
     public UserRegisterResponse userRegister(UserRequestDto userRequestDto) {
+        // Check if email already exists
+        CallResult<UsersEntity> exist =  CallWrapper.syncCall(() -> userRepository.findByEmailAddress(userRequestDto.getEmailAddress()));
+        if(exist.getResult().getId() != null) {
+            logger.error("User#exist: Email already exists. {}", exist.getResult().getEmailAddress());
+            throw ApplicationError.Conflict(exist.getResult().getEmailAddress()dd);
+        }
+
         // Validator
         Set<ConstraintViolation<UserRequestDto>> violations = validator.validate(userRequestDto);
 
