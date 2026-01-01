@@ -1,5 +1,8 @@
 # RainyDays Backend Service
-An emergency Fund manual tracker for you and your loved ones - building your safety net.
+This product is a family emergency fund coordination system designed for countries with weak healthcare safety nets.
+It helps families pre-commit money, define clear emergency rules, and make fast, fair decisions when hospital bills hit without holding
+or pooling funds. By enforcing transparency, approvals, and contribution-based limits, the system replace panic, guilt, and chaos
+with clarity and speed during life-and-death situations. When time matters most, families decide faster, argue less, and act together.
 
 <!-- 
 [![Build Status](https://github.com/my-user/my-app/workflows/CI/badge.svg)](https://github.com/my-user/my-app/actions) -->
@@ -8,6 +11,7 @@ An emergency Fund manual tracker for you and your loved ones - building your saf
 
 ## Table of Contents
 * [Introduction](#introduction)
+* [Rules](#rules)
 * [Features](#features)
 * [Prerequisites](#prerequisites)
 * [Getting Started](#getting-started)
@@ -23,6 +27,23 @@ We Filipino's tend to have not save for "Rainy Days" or we can say Emergencies. 
 Feel free to donate or buy us a coffee :)
 
 Original idea was from Karl Marx Roxas (me) and I asked my former college classmate and a close friend to help me execute this project (Geli Robiso).
+
+### Rules
+1. **Purpose**: Coordinate and enforce family emergency fund behavior during life-and-death-without holding money.
+2. **Target Users**: Filipino families with multiple income earners, weak assurance coverage, and high exposure to medical emergencies.
+3. **Group Structure**: Fixed groups (3-10 members).
+4. **Contributions**: Fixed minimum monthly contribution set by group creator. Contributions are manually logged, and immutable.
+5. **Transparency**: All contributors, missed payments, approvals, and withdrawals are visible to all group members.
+6. **Emergency Types**: Hospitalization, Death, Burial, Calamity. Request outside these categories are not allowed.
+7. **Withdrawal Thresholds**: Small (<= 10,000 PHP or 10% of committed funds), Medium (>Small to <= 50%), Large (>50%).
+8. **Approval Rules**: Small auto-approved if eligible. Medium required 2-of-N approval. Large requires majority approval.
+9. **Approval Window**: Time-bound (30-60minutes). Silence never equals consent.
+10. **Fallback Behavior**: If approval expires, no withdrawal occurs. Request escalates to designated emergency approver(s).
+11. **Withdrawal Cap Formula**: Maximum withdrawal equals the lesser of (lifetime contribution x 1.5) or total committed group funds.
+12. **Cooldown Period**: 30 days per member after a successful withdrawal. Repeated withdrawals increase approval requirements.
+13. **Non-Contributor Penalties**: 1 missed month = warning; 2 = loss of approval rights; 3 = withdrawal capped to small; 4 = auto-removal. (FOR R&D)
+14. **Abuse Prevention**: Evidence required, permanent history, contribution-weighted rights, and visible trust records.
+15. **System Role**: Coordinator and rules engine only. No custody of funds, no payment guarantees.
 
 ### Features
 1. Personal Emergency Fund Tracker
