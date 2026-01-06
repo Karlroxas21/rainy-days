@@ -30,10 +30,7 @@ clean:
 
 ## Drop all db
 make drop-db:
-	liquibase dropAll \
-	--url="jdbc:postgresql://localhost:5432/rainydays" \
-    --username=dev \
-    --password=dev \
+	./mvnw liquibase:dropAll
 
 ## Liquibase Migratehistory
 migrate-history:

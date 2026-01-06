@@ -43,6 +43,9 @@ public class UsersEntity {
     @Column(name = "profile_url")
     private String profileUrl;
 
+    @Column(name = "goal")
+    private int goal;
+
     @Column(name = "created_at", updatable = false, insertable = false)
     private OffsetDateTime createdAt;
 

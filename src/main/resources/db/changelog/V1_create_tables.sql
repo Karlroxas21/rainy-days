@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
 	middle_name VARCHAR(255),
 	last_name VARCHAR(255),
 	suffix VARCHAR(10),
+    goal BIGINT NOT NULL,
 	profile_url VARCHAR(255),
 	created_at TIMESTAMPTZ DEFAULT NOW(),
 	updated_at TIMESTAMPTZ,
