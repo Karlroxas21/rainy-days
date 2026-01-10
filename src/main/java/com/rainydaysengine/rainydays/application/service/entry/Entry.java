@@ -327,6 +327,18 @@ public class Entry implements IEntryService {
         return groupCompleteHistory;
     }
 
+    @Override
+    public TotalPersonalFundByUserResponse totalPersonalFundByUserResponse(String userId) {
+        CallResult<TotalPersonalFundByUserResponse> totalPersonalFundByUser= CallWrapper.syncCall(() ->
+                this.userEntriesRepository.findTotalPersonalFundByUser(UUID.fromString(userId)));
+        if (totalPersonalFundByUser.isFailure()) {
+            logger.error("Entry#totalPersonalFundByUser(): this.userEntriesRepository.findTotalPersonalFundByUser() failed", totalPersonalFundByUser.getError());
+            throw ApplicationError.InternalError(totalPersonalFundByUser.getError());
+        }
+
+        return totalPersonalFundByUser.getResult();
+    }
+
     private String uploadFile(MultipartFile file, String user) throws Exception {
         String renamedFile = RenameFile.rename(file, "karl");
         String objectName = "app/entries/" + renamedFile;
