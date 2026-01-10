@@ -1,9 +1,6 @@
 package com.rainydaysengine.rainydays.application.port.entry;
 
-import com.rainydaysengine.rainydays.application.service.entry.DepositEntryDto;
-import com.rainydaysengine.rainydays.application.service.entry.EntryResponse;
-import com.rainydaysengine.rainydays.application.service.entry.RecentEntriesResponse;
-import com.rainydaysengine.rainydays.application.service.entry.TotalAmountContributedByUserResponse;
+import com.rainydaysengine.rainydays.application.service.entry.*;
 import com.rainydaysengine.rainydays.application.service.entry.groupstatistics.GroupStatisticResponse;
 import com.rainydaysengine.rainydays.application.service.entry.history.GroupCompleteHistory;
 import org.springframework.data.domain.Page;
@@ -25,4 +22,6 @@ public interface IEntryService {
             Integer month,
             Integer year,
             Pageable pageable);
+
+    TotalPersonalFundByUserResponse totalPersonalFundByUserResponse(String userId);
 }

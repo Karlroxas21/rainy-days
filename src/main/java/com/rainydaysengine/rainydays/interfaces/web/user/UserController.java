@@ -142,4 +142,11 @@ public class UserController {
         return ResponseEntity.ok(res);
     }
 
+    @GetMapping(value = "/{userId}/total-personal-fund")
+    public ResponseEntity<TotalPersonalFundByUserResponse> getTotalPersonalFundByUser(@PathVariable String userId) {
+        TotalPersonalFundByUserResponse total = entry.totalPersonalFundByUserResponse(userId);
+
+        return ResponseEntity.ok(total);
+    }
+
 }

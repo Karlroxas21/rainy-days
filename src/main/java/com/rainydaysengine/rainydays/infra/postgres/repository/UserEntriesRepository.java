@@ -3,6 +3,7 @@ package com.rainydaysengine.rainydays.infra.postgres.repository;
 import com.rainydaysengine.rainydays.application.service.entry.EntryResponse;
 import com.rainydaysengine.rainydays.application.service.entry.RecentEntriesResponse;
 import com.rainydaysengine.rainydays.application.service.entry.TotalAmountContributedByUserResponse;
+import com.rainydaysengine.rainydays.application.service.entry.TotalPersonalFundByUserResponse;
 import com.rainydaysengine.rainydays.application.service.entry.groupstatistics.GroupProgress;
 import com.rainydaysengine.rainydays.application.service.entry.groupstatistics.MemberRanking;
 import com.rainydaysengine.rainydays.application.service.entry.history.AllRecentEntriesInGroup;
@@ -124,6 +125,31 @@ public interface UserEntriesRepository extends JpaRepository<UserEntriesEntity, 
                  u.profile_url
             """)
     Optional<TotalAmountContributedByUserResponse> findTotalAmountContributedByUser(@Param("userId") UUID userId, @Param("groupId") UUID groupId);
+
+
+    @NativeQuery(
+            """
+            SELECT SUM(e.amount) AS total_personal_fund
+            FROM
+                user_entries ue
+            LEFT JOIN
+                entries e ON ue.entry_id = e.id
+            WHERE 
+                ue.user_id = :userId
+            AND
+                group_id IS NULL 
+            """
+    )
+    TotalPersonalFundByUserResponse findTotalPersonalFundByUser(@Param("userId") UUID userId);
+
+    /**
+     * SELECT SUM(e.amount) as total_personal_fund FROM user_entries ue
+     * LEFT JOIN entries e on ue.entry_id = e.id
+     * where group_id IS NULL
+     *
+     * @param groupId
+     * @return
+     */
 
     // Select Group Progress
     @NativeQuery("""
