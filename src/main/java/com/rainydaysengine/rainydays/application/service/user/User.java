@@ -125,7 +125,8 @@ public class User implements IUserService {
                 Optional.ofNullable(userEntity.getResult().getMiddleName()),
                 userEntity.getResult().getLastName(),
                 Optional.ofNullable(userEntity.getResult().getSuffix()),
-                userEntity.getResult().getProfileUrl()
+                userEntity.getResult().getProfileUrl(),
+                userEntity.getResult().getGoal()
         );
     }
 

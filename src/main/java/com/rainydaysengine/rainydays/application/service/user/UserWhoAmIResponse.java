@@ -1,5 +1,6 @@
 package com.rainydaysengine.rainydays.application.service.user;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -10,6 +11,7 @@ public record UserWhoAmIResponse(
         Optional<String> middleName,
         String lastName,
         Optional<String> suffix,
-        String profileUrl
+        String profileUrl,
+        int goal
 ) {
 }
