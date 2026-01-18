@@ -78,7 +78,7 @@ public class UserController {
     // param options: sort=<value>,desc|asc
     // page, size, search=value
     @GetMapping(value = "/{userId}/entries")
-    public ResponseEntity<PaginationResponse<RecentEntriesResponse>> getRecentEntriesByUserId(
+    public ResponseEntity<RecentEntriesPageResponse> getRecentEntriesByUserId(
             @PathVariable String userId,
             @RequestParam(required = false) String search,
             @PageableDefault(page = 0, size = DEFAULT_PAGE_SIZE, direction = Sort.Direction.DESC)
@@ -86,18 +86,9 @@ public class UserController {
     ) {
         String searchValue = (search == null || search.isBlank()) ? "" : search;
 
-        Page<RecentEntriesResponse> userEntries = entry.recentEntriesByUserId(userId, searchValue, pageable);
+        RecentEntriesPageResponse userEntries = entry.recentEntriesByUserId(userId, searchValue, pageable);
 
-        PaginationResponse<RecentEntriesResponse> res = new PaginationResponse<>(
-                userEntries.getContent(),
-                userEntries.getNumber(),
-                userEntries.getTotalElements(),
-                userEntries.getTotalPages(),
-                userEntries.getSize(),
-                pageable.getSort().toString()
-        );
-
-        return ResponseEntity.ok(res);
+        return ResponseEntity.ok(userEntries);
     }
 
     @GetMapping(value = "/{userId}/entries/{entryId}")

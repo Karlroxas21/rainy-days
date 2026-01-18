@@ -1,9 +1,6 @@
 package com.rainydaysengine.rainydays.infra.postgres.repository;
 
-import com.rainydaysengine.rainydays.application.service.entry.EntryResponse;
-import com.rainydaysengine.rainydays.application.service.entry.RecentEntriesResponse;
-import com.rainydaysengine.rainydays.application.service.entry.TotalAmountContributedByUserResponse;
-import com.rainydaysengine.rainydays.application.service.entry.TotalPersonalFundByUserResponse;
+import com.rainydaysengine.rainydays.application.service.entry.*;
 import com.rainydaysengine.rainydays.application.service.entry.groupstatistics.GroupProgress;
 import com.rainydaysengine.rainydays.application.service.entry.groupstatistics.MemberRanking;
 import com.rainydaysengine.rainydays.application.service.entry.history.AllRecentEntriesInGroup;
@@ -29,10 +26,11 @@ public interface UserEntriesRepository extends JpaRepository<UserEntriesEntity, 
                  e.id,
                  e.entryType,
                  e.amount,
-                 e.notes,
                  e.photoEvidence,
+                 e.notes,
                  g.id,
-                 g.groupName
+                 g.groupName,
+                 ue.createdAt
              FROM
                  UserEntriesEntity ue
                  JOIN EntriesEntity e ON ue.entryId = e.id

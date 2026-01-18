@@ -34,6 +34,9 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+import java.time.YearMonth;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -42,13 +45,12 @@ import java.util.UUID;
 @Service
 public class Entry implements IEntryService {
     private static final Logger logger = LoggerFactory.getLogger(Entry.class);
-
+    private static final ZoneId MANILA_ZONE = ZoneId.of("Asia/Manila");
     private final EntryRepository entryRepository;
     private final UserEntriesRepository userEntriesRepository;
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
     private final IEntryPort minio;
-
     @Value("${minio.bucket}")
     private String bucket;
 
@@ -137,7 +139,7 @@ public class Entry implements IEntryService {
      * @return RecentEntriesResponse
      */
     @Override
-    public Page<RecentEntriesResponse> recentEntriesByUserId(String userId, String search, Pageable pageable) {
+    public RecentEntriesPageResponse recentEntriesByUserId(String userId, String search, Pageable pageable) {
         CallResult<Page<RecentEntriesResponse>> userEntries =
                 CallWrapper.syncCall(() -> this.userEntriesRepository.findAllRecentEntriesByUserId(UUID.fromString(userId), search, pageable));
         if (userEntries.isFailure()) {
@@ -146,7 +148,58 @@ public class Entry implements IEntryService {
             throw ApplicationError.InternalError(userEntries.getError());
         }
 
-        return userEntries.getResult();
+        Page<RecentEntriesResponse> page = userEntries.getResult();
+        List<RecentEntriesResponse> entries = page.getContent();
+
+        ZonedDateTime nowManila = ZonedDateTime.now(MANILA_ZONE);
+
+        YearMonth currentMonth = YearMonth.from(nowManila);
+        YearMonth twelveMonthsAgo = currentMonth.minusMonths(11);
+
+        // Get createdAt of each in Map of RecenEntriesResponse
+        // Then convert OffsetDateTime to ZonedDateTime
+        // Calculate up value in current month
+        // Calculate Months Active out of 12
+
+        int currentMonthTotal = entries.stream().filter(
+                        e -> {
+                            ZonedDateTime manilaTime = e.createdAt().atZoneSameInstant(MANILA_ZONE);
+
+                            return YearMonth.from(manilaTime).equals(currentMonth);
+                        }
+                ).mapToInt(RecentEntriesResponse::entryAmount) // Same as e -> e.entryAmount()
+                .sum();
+
+        // If you had entries in January. Feb, March, and June, even with many entries in those months, it is still 4.
+        long monthsActive = entries.stream().map(e -> e.createdAt().atZoneSameInstant(MANILA_ZONE))
+                .map(YearMonth::from) // e -> YearMonth.from(e)
+                .filter(ym -> !ym.isBefore(twelveMonthsAgo) && !ym.isAfter(currentMonth))
+                .distinct()
+                .count();
+
+        List<RecentEntriesResponse> responseList = entries.stream()
+                .map(row -> new RecentEntriesResponse(
+                        row.entryId(),
+                        row.entryType(),
+                        row.entryAmount(),
+                        row.entryPhoto(),
+                        row.entryNotes(),
+                        row.groupId(),
+                        row.groupName(),
+                        row.createdAt()
+                ))
+                .toList();
+
+        return new RecentEntriesPageResponse(
+                responseList,
+                currentMonthTotal,
+                monthsActive,
+                page.getNumber(),
+                page.getTotalElements(),
+                page.getTotalPages(),
+                page.getSize(),
+                pageable.getSort().toString()
+        );
     }
 
     /**
@@ -329,7 +382,7 @@ public class Entry implements IEntryService {
 
     @Override
     public TotalPersonalFundByUserResponse totalPersonalFundByUserResponse(String userId) {
-        CallResult<TotalPersonalFundByUserResponse> totalPersonalFundByUser= CallWrapper.syncCall(() ->
+        CallResult<TotalPersonalFundByUserResponse> totalPersonalFundByUser = CallWrapper.syncCall(() ->
                 this.userEntriesRepository.findTotalPersonalFundByUser(UUID.fromString(userId)));
         if (totalPersonalFundByUser.isFailure()) {
             logger.error("Entry#totalPersonalFundByUser(): this.userEntriesRepository.findTotalPersonalFundByUser() failed", totalPersonalFundByUser.getError());
