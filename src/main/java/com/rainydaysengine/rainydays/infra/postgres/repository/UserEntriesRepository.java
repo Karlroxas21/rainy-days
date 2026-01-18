@@ -36,7 +36,7 @@ public interface UserEntriesRepository extends JpaRepository<UserEntriesEntity, 
              FROM
                  UserEntriesEntity ue
                  JOIN EntriesEntity e ON ue.entryId = e.id
-                 JOIN GroupEntity g ON ue.groupId = g.id
+                 LEFT JOIN GroupEntity g ON ue.groupId = g.id
              WHERE 
                  ue.userId = :userId
                  AND (
